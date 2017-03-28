@@ -1,6 +1,8 @@
 {
   "name": "attriboots",
   "description": "",
+  "homepage": "https://github.com/okitu/attriboots",
+  "version": "0.0.1",
   "main": "dist/attriboots.js",
   "author": {
     "name": "David Schäfer",
