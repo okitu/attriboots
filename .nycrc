@@ -1,0 +1,14 @@
+{
+    "require": [
+        "babel-register"
+    ],
+    "include": [
+        "src/**/*.js"
+    ],
+    "exclude": [
+        "src/easing.js",
+        "src/index.js"
+    ],
+    "sourceMap": false,
+    "instrument": false
+}
