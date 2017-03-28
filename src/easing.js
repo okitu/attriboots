@@ -1,4 +1,6 @@
 /**
+ * @author David Schäfer, me@okitu.de
+ * 
  * Various easing methods adopted from Robert Penner.
  */
 export default class Easing {
