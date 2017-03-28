@@ -1,6 +1,12 @@
 import babel from 'rollup-plugin-babel';
-import path from 'path';
 import license from 'rollup-plugin-license';
+import fs from 'fs';
+
+// Load license and add as banner
+var banner = fs.readFileSync(__dirname + '/LICENSE', 'utf-8');
+
+// Add @license tag
+banner = banner + '\n@license\n';
 
 export default {
     entry: 'src/index.js',
@@ -9,10 +15,7 @@ export default {
     plugins: [
         license({
             sourceMap: true,
-            banner: {
-                file: path.join(__dirname, 'LICENSE'),
-                encoding: 'utf-8', // Default is utf-8 
-            }
+            banner: banner
         }),
         babel()
     ],
