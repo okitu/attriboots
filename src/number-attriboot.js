@@ -3,7 +3,7 @@ import BaseAttriboot from './base-attriboot';
 /**
  * @author David Schäfer, me@okitu.de
  */
-export default class NumberBaseAttriboot extends BaseAttriboot {
+export default class NumberAttriboot extends BaseAttriboot {
 
     constructor({
 
@@ -329,7 +329,7 @@ export default class NumberBaseAttriboot extends BaseAttriboot {
     }
 
     // toString() {
-    //     var str: String = "NumberBaseAttriboot( ";
+    //     var str: String = "NumberAttriboot( ";
 
     //     if (_id)
     //         str += "id: " + id + ", "
