@@ -1,0 +1,24 @@
+{
+  "name": "attriboots",
+  "description": "",
+  "main": "dist/attriboots.js",
+  "author": {
+    "name": "David Schäfer",
+    "email": "me@okitu.de",
+    "web": "http://okitu.de"
+  },
+  "license": "MIT",
+  "keywords": [
+    "properties",
+    "attributes"
+  ],
+  "homepage": "https://github.com/okitu/attriboots",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "coverage",
+    ".nyc_output"
+  ]
+}
