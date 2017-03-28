@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- * 
  * @license
  */
 
@@ -80,6 +79,8 @@
     };
 
     /**
+     * @author David Schäfer, me@okitu.de
+     * 
      * Various easing methods adopted from Robert Penner.
      */
     var Easing = function() {
@@ -516,12 +517,13 @@
 
     /**
      * @author David Schäfer, me@okitu.de
+     * 
      */
 
-    var NumberBaseAttriboot = function(_BaseAttriboot) {
-        inherits(NumberBaseAttriboot, _BaseAttriboot);
+    var NumberAttriboot = function(_BaseAttriboot) {
+        inherits(NumberAttriboot, _BaseAttriboot);
 
-        function NumberBaseAttriboot() {
+        function NumberAttriboot() {
             var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
                 _ref$target = _ref.target,
                 target = _ref$target === undefined ? 0 : _ref$target,
@@ -534,9 +536,9 @@
                 _ref$exclusiveMax = _ref.exclusiveMax,
                 exclusiveMax = _ref$exclusiveMax === undefined ? false : _ref$exclusiveMax;
 
-            classCallCheck(this, NumberBaseAttriboot);
+            classCallCheck(this, NumberAttriboot);
 
-            var _this = possibleConstructorReturn(this, (NumberBaseAttriboot.__proto__ || Object.getPrototypeOf(NumberBaseAttriboot)).apply(this, arguments));
+            var _this = possibleConstructorReturn(this, (NumberAttriboot.__proto__ || Object.getPrototypeOf(NumberAttriboot)).apply(this, arguments));
 
             _this._target = 0;
             _this._lastTarget = 0;
@@ -559,7 +561,7 @@
          * Raw target value, without adjustements (eg. min/max-clamping)
          */
 
-        createClass(NumberBaseAttriboot, [{
+        createClass(NumberAttriboot, [{
             key: '_clamp',
 
             //
@@ -722,7 +724,7 @@
             }
 
             // toString() {
-            //     var str: String = "NumberBaseAttriboot( ";
+            //     var str: String = "NumberAttriboot( ";
 
             //     if (_id)
             //         str += "id: " + id + ", "
@@ -903,11 +905,11 @@
                 return this._stored;
             }
         }]);
-        return NumberBaseAttriboot;
+        return NumberAttriboot;
     }(BaseAttriboot);
 
     exports.Easing = Easing;
-    exports.NumberAttriboot = NumberBaseAttriboot;
+    exports.NumberAttriboot = NumberAttriboot;
 
     Object.defineProperty(exports, '__esModule', {
         value: true
