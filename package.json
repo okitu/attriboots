@@ -10,10 +10,11 @@
     "web": "http://okitu.de"
   },
   "scripts": {
-    "build": "npm run build:rollup && npm run build:beautify && npm run build:uglify",
-    "build:rollup": "cross-env NODE_ENV=build rollup -c",
-    "build:beautify": "js-beautify dist/attriboots.js --replace",
-    "build:uglify": "uglifyjs dist/attriboots.js --compress --mangle --comments --screw-ie8 --output dist/attriboots.min.js",
+    "build": "npm run test && npm run compile",
+    "compile": "npm run compile:rollup && npm run compile:beautify && npm run compile:uglify",
+    "compile:rollup": "cross-env NODE_ENV=build rollup -c",
+    "compile:beautify": "js-beautify dist/attriboots.js --replace",
+    "compile:uglify": "uglifyjs dist/attriboots.js --compress --mangle --comments --screw-ie8 --output dist/attriboots.min.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "eslint ./src",
     "test:unit": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text mocha test/test.js"
