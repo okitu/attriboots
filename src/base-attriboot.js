@@ -29,7 +29,6 @@ export default class BaseAttriboot {
         this.steps = steps;
         this.easing = easing;
 
-        this._dirty = false;
         this._updated = false;
     }
 
@@ -61,7 +60,7 @@ export default class BaseAttriboot {
      * @type {boolean}
      */
     get dirty() {
-        return this._dirty;
+        return this._current != this._target;
     }
 
     /**
@@ -121,7 +120,10 @@ export default class BaseAttriboot {
         if (typeof(steps) != 'number')
             throw new TypeError('"steps" must be a number');
 
-        this._steps = Math.round(steps);
+        this._steps = Math.round(Math.abs(steps));
+
+        if (this._steps === 0 && this.dirty)
+            this.updateImmediate();
     }
 
     /**
@@ -154,7 +156,11 @@ export default class BaseAttriboot {
 
     /**
      * Updates `current` if not equal to `target`.
-     *
+     * 
+     * Tip: By using milliseconds for `delta` and
+     * the `steps`property, timed-based updating is possible.
+     * 
+     * @param {integer} [delta=1] Amount of steps to ease to target.
      * @return Returns true, if `current` has been updated.
      */
     update() {
@@ -178,4 +184,88 @@ export default class BaseAttriboot {
     stop() {
         return false;
     }
+
+    //
+    // EventTarget Interface
+    // https://developer.mozilla.org/en-US/docs/Web/API/Event
+    // --------------------------------------------------
+
+    addEventListener(type, callback) {
+        if (!this._listeners) this._listeners = {};
+        if (!(type in this._listeners)) {
+            this._listeners[type] = [];
+        }
+        this._listeners[type].push(callback);
+    }
+
+    removeEventListener(type, callback) {
+        if (!(type in this._listeners)) {
+            return;
+        }
+        var stack = this._listeners[type];
+        for (var i = 0, l = stack.length; i < l; i++) {
+            if (stack[i] === callback) {
+                stack.splice(i, 1);
+                return;
+            }
+        }
+    }
+
+    dispatchEvent(event) {
+        if (this._listeners === undefined)
+            return;
+
+        if (!(event.type in this._listeners)) {
+            return true;
+        }
+        var stack = this._listeners[event.type];
+        event.target = this;
+        for (var i = 0, l = stack.length; i < l; i++) {
+            stack[i].call(this, event);
+        }
+        return !event.defaultPrevented;
+    }
+
+    //
+    // Event shorthands
+    // --------------------------------------------------
+
+    /**
+     * Dispatch an 'update' event.
+     * @protected
+     */
+    _triggerUpdate() {
+
+        /**
+         * Update event.
+         * Dispatched when `current` is updated.
+         *
+         * @event update
+         * @type {object}
+         */
+        this.dispatchEvent({
+            type: 'update',
+            value: this._current
+        });
+    }
+
+    /**
+     * Dispatch a 'change' event.
+     * @protected
+     */
+    _triggerChange() {
+
+        /**
+         * Change event.
+         * Dispatched when `target` changes.
+         *
+         * @event change
+         * @type {object}
+         */
+        this.dispatchEvent({
+            type: 'change',
+            value: this._target
+        });
+    }
+
 }

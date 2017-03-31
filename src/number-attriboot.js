@@ -73,7 +73,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         this._change = this._target - this.current;
         this._step = 0;
 
-        this._dirty = true;
+        this._triggerChange();
 
         if (this.steps === 0)
             this.updateImmediate();
@@ -224,20 +224,33 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * Updates `current` if not equal to `target`.
+     * @param {integer} [delta=1] Amount of steps to ease to target.
      * @return {boolean} Returns true, if `current` has been updated.
      */
-    update() {
-        if (this._current != this._target) {
+    update(delta) {
+
+        if (delta === undefined) {
+            delta = 1;
+        } else {
+
+            if (typeof(delta) != 'number' || delta < 0)
+                throw new TypeError('"delta" must be a number');
+
+            delta = Math.round(Math.abs(delta));
+        }
+
+        if (this.dirty) {
 
             this._previous = this._current;
-            this._current = this.easing(++this._step, this._start, this._change, this._steps);
+            this._step = Math.min(this._step + delta, this._steps);
+            this._current = this.easing(this._step, this._start, this._change, this._steps);
             this._updated = true;
 
         } else {
             this._updated = false;
         }
 
-        this._dirty = this._current != this._target;
+        this._updated && this._triggerUpdate();
 
         return this._updated;
     }
@@ -247,15 +260,17 @@ export default class NumberAttriboot extends BaseAttriboot {
      * @return {boolean} Returns true, if `current` has been updated.
      */
     updateImmediate() {
-        if (this._current != this._target) {
+        if (this.dirty) {
+
             this._previous = this._current;
             this._current = this._target;
             this._updated = true;
+
         } else {
             this._updated = false;
         }
 
-        this._dirty = false;
+        this._updated && this._triggerUpdate();
 
         return this._updated;
     }
@@ -265,17 +280,21 @@ export default class NumberAttriboot extends BaseAttriboot {
      * @return {boolean} Returns true, if `target` has been updated.
      */
     stop() {
-        if (this._current != this._target) {
+        var targetChanged;
+
+        if (this.dirty) {
+
             this._lastTarget = this._target;
             this._target = this._current;
-            this._updated = true;
+            targetChanged = true;
+
         } else {
-            this._updated = false;
+            targetChanged = false;
         }
 
-        this._dirty = false;
+        targetChanged && this._triggerChange();
 
-        return this._updated;
+        return targetChanged;
     }
 
     /**
@@ -295,9 +314,13 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (typeof(offset) != 'number')
             throw new TypeError('"offset" must be a number');
 
-        this.target += offset;
-        this._current += offset;
-        this._updated = true;
+        if (offset !== 0) {
+
+            this.target += offset;
+            this._current += offset;
+            this._updated = true;
+
+        }
     }
 
     /**
