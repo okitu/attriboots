@@ -1,4 +1,9 @@
 /**
+ * attriboots@0.0.3
+ * https://github.com/okitu/attriboots
+ *
+ * @license
+ *
  * MIT License
  * 
  * Copyright (c) 2017 David Schäfer
