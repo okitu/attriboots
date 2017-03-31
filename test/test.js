@@ -1,8 +1,12 @@
 /* eslint-env node, mocha */
 
-// Import chai and use 'expect'
-let chai = require('chai');
+import chai from 'chai';
+import sinon from 'sinon';
+import sinonChai from 'sinon-chai';
+
+// use 'expect' & sinon-chai
 let expect = chai.expect;
+chai.use(sinonChai);
 
 // Import the classes.
 import BaseAttriboot from '../src/base-attriboot';
@@ -108,12 +112,48 @@ describe('attriboots', () => {
             });
         });
 
+        describe('EventTarget interface', () => {
+
+            it('should work', () => {
+
+                var eventSpy = sinon.spy();
+
+                attriboot.dispatchEvent({
+                    type: 'test'
+                });
+                expect(eventSpy).to.have.been.callCount(0);
+
+                attriboot.addEventListener('test', eventSpy);
+
+                attriboot.dispatchEvent({
+                    type: 'test'
+                });
+                expect(eventSpy).to.have.been.callCount(1);
+
+                attriboot.dispatchEvent({
+                    type: 'unknown'
+                });
+                expect(eventSpy).to.have.been.callCount(1);
+
+                attriboot.removeEventListener('test', eventSpy);
+                attriboot.removeEventListener('unknown', eventSpy);
+
+                attriboot.dispatchEvent({
+                    type: 'test'
+                });
+                expect(eventSpy).to.have.been.callCount(1);
+            });
+
+        });
+
     });
 
     describe('NumberAttriboot', () => {
 
         beforeEach(() => {
-            attriboot = new NumberAttriboot();
+            attriboot = new NumberAttriboot({
+                easing: NumberAttriboot.Easing.linear
+            });
         });
 
         it('should have correct default values and working getters', () => {
@@ -152,6 +192,27 @@ describe('attriboots', () => {
 
         describe('.target', () => {
             _simpleSetterTests('target', 5, 'not-number');
+
+            it('should #updateImmediate if steps is 0', () => {
+                attriboot.steps = 0;
+                attriboot.target = 5;
+                expect(attriboot.updated).to.be.true;
+                expect(attriboot.current).to.equal(5);
+            });
+
+            it('should dispatch events when necessary', () => {
+
+                var changeSpy = sinon.spy();
+                attriboot.addEventListener('change', changeSpy);
+
+                attriboot.target = 0;
+                expect(changeSpy).to.not.have.been.called;
+                attriboot.target = 1;
+                expect(changeSpy).to.have.been.calledOnce;
+                attriboot.target = 2;
+                expect(changeSpy).to.have.been.calledTwice;
+
+            });
         });
 
         describe('.lastTarget', () => {
@@ -166,6 +227,7 @@ describe('attriboots', () => {
             _simpleSetterTests('min', 3, 'not-number');
 
             it('should ensure target is greater or equal than min', () => {
+
                 attriboot.min = 10;
                 attriboot.target = 15;
                 expect(attriboot.target).to.equal(15);
@@ -269,16 +331,22 @@ describe('attriboots', () => {
             it('should work', () => {
 
                 attriboot.steps = 2;
-                attriboot.target = 5;
+                attriboot.target = 4;
+
+                expect(attriboot.current).to.equal(0);
 
                 expect(attriboot.update()).to.be.true;
+                expect(attriboot.current).to.equal(2);
+
                 expect(attriboot.update()).to.be.true;
-                expect(attriboot.update()).to.be.false;
+                expect(attriboot.current).to.equal(4);
+
+                expect(attriboot.dirty).to.be.false;
             });
 
-            it('should #updateImmediate if target is changed an steps is 0', () => {
-                attriboot.steps = 0;
+            it('should #updateImmediate if steps is changed to 0 and dirty is true', () => {
                 attriboot.target = 5;
+                attriboot.steps = 0;
                 expect(attriboot.updated).to.be.true;
                 expect(attriboot.current).to.equal(5);
             });
@@ -288,31 +356,71 @@ describe('attriboots', () => {
         describe('#update', () => {
 
             it('should work', () => {
+
+                var updateSpy = sinon.spy();
+                attriboot.addEventListener('update', updateSpy);
+
                 attriboot.target = 10;
                 attriboot.steps = 3;
 
                 expect(attriboot.current).to.equal(0);
+
                 expect(attriboot.update()).to.be.true;
+                expect(updateSpy).to.have.callCount(1);
                 expect(attriboot.current).to.be.above(0);
 
                 expect(attriboot.update()).to.be.true;
+                expect(updateSpy).to.have.callCount(2);
+
                 expect(attriboot.update()).to.be.true;
+                expect(updateSpy).to.have.callCount(3);
+
                 expect(attriboot.update()).to.be.false;
+                expect(updateSpy).to.have.callCount(3);
                 expect(attriboot.current).to.equal(10);
+                expect(attriboot.dirty).to.be.false;
+            });
+
+            it('should use the delta parameter', () => {
+
+                var updateSpy = sinon.spy();
+                attriboot.addEventListener('update', updateSpy);
+
+                expect(() => {
+                    attriboot.update('not-number');
+                }).to.throw(Error);
+
+                attriboot.steps = 1000;
+                attriboot.target = 4;
+
+                expect(attriboot.current).to.equal(0);
+                expect(attriboot.update(200)).to.be.true;
+                expect(attriboot.update(800)).to.be.true;
+                expect(attriboot.dirty).to.be.false;
+                expect(attriboot.update(100)).to.be.false;
+
             });
         });
 
         describe('#updateImmediate', () => {
 
             it('should work', () => {
+
+                var updateSpy = sinon.spy();
+                attriboot.addEventListener('update', updateSpy);
+
                 attriboot.target = 10;
                 attriboot.steps = 3;
 
                 expect(attriboot.current).to.equal(0);
+
                 expect(attriboot.updateImmediate()).to.be.true;
+                expect(updateSpy).to.have.callCount(1);
                 expect(attriboot.current).to.equal(10);
-                expect(attriboot.update()).to.be.false;
+
                 expect(attriboot.updateImmediate()).to.be.false;
+                expect(attriboot.dirty).to.be.false;
+                expect(updateSpy).to.have.callCount(1);
             });
         });
 
@@ -323,9 +431,9 @@ describe('attriboots', () => {
                 attriboot.steps = 3;
 
                 expect(attriboot.current).to.equal(0);
-                expect(attriboot.update()).to.be.true;
                 expect(attriboot.stop()).to.be.true;
                 expect(attriboot.target).to.equal(attriboot.current);
+                expect(attriboot.dirty).to.be.false;
                 expect(attriboot.update()).to.be.false;
                 expect(attriboot.stop()).to.be.false;
             });
