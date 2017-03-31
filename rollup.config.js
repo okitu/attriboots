@@ -2,10 +2,14 @@ import babel from 'rollup-plugin-babel';
 import license from 'rollup-plugin-license';
 import fs from 'fs';
 
-// Load license and add as banner
-var banner = fs.readFileSync(__dirname + '/LICENSE', 'utf-8');
+var banner = '' +
+    '<%= pkg.name %>@<%= pkg.version %> \n' +
+    '<%= pkg.homepage %> \n\n' +
+    '@license \n\n';
 
-// Add @license tag
+// Load license and add to banner
+banner += fs.readFileSync(__dirname + '/LICENSE', 'utf-8');
+
 banner = banner + '\n@license\n';
 
 export default {
