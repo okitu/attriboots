@@ -319,7 +319,6 @@ export default class NumberAttriboot extends BaseAttriboot {
             this.target += offset;
             this._current += offset;
             this._updated = true;
-
         }
     }
 
@@ -336,7 +335,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * Set `target` to `stored`.
-     * param {boolean} ignoreLock If true, will restore even if the BaseAttriboot is locked.
+     * param {boolean} ignoreLock If true, will restore even if `locked` is true.
      */
     restore(ignoreLock = false) {
         if (typeof(ignoreLock) != 'boolean')
