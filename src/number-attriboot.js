@@ -21,7 +21,6 @@ export default class NumberAttriboot extends BaseAttriboot {
 
         this._target = 0;
         this._lastTarget = 0;
-        this._change = 0;
         this._current = 0;
         this._previous = 0;
         this._raw = 0;
@@ -70,7 +69,6 @@ export default class NumberAttriboot extends BaseAttriboot {
 
         // Setup easing values
         this._start = this.current;
-        this._change = this._target - this.current;
         this._step = 0;
 
         this._triggerChange();
@@ -243,7 +241,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
             this._previous = this._current;
             this._step = Math.min(this._step + delta, this._steps);
-            this._current = this.easing(this._step, this._start, this._change, this._steps);
+            this._current = this.easing(this._step, this._start, this._target - this._start, this._steps);
             this._updated = true;
 
         } else {
