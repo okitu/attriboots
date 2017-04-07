@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.3
+ * attriboots@0.0.4
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -325,8 +325,8 @@
                 enabled = _ref$enabled === undefined ? true : _ref$enabled,
                 _ref$ignoreBounds = _ref.ignoreBounds,
                 ignoreBounds = _ref$ignoreBounds === undefined ? false : _ref$ignoreBounds,
-                _ref$steps = _ref.steps,
-                steps = _ref$steps === undefined ? 30 : _ref$steps,
+                _ref$animationTime = _ref.animationTime,
+                animationTime = _ref$animationTime === undefined ? 300 : _ref$animationTime,
                 _ref$easing = _ref.easing,
                 easing = _ref$easing === undefined ? Easing.outQuad : _ref$easing,
                 _ref$locked = _ref.locked,
@@ -342,7 +342,7 @@
             this.enabled = enabled;
             this.locked = locked;
             this.ignoreBounds = ignoreBounds;
-            this.steps = steps;
+            this.animationTime = animationTime;
             this.easing = easing;
 
             this._updated = false;
@@ -363,10 +363,7 @@
             /**
              * Updates `current` if not equal to `target`.
              * 
-             * Tip: By using milliseconds for `delta` and
-             * the `steps`property, timed-based updating is possible.
-             * 
-             * @param {integer} [delta=1] Amount of steps to ease to target.
+             * @param {integer} [delta] Time since last call. If not set, will be calculated.
              * @return Returns true, if `current` has been updated.
              */
             value: function update() {
@@ -375,7 +372,6 @@
 
             /**
              * Set the `current` to `target`.
-             *
              * @return Returns true, if `current` has been updated.
              */
 
@@ -387,7 +383,6 @@
 
             /**
              * Sets `target` to `current`.
-             *
              * @return Returns true, if `target` has been updated.
              */
 
@@ -564,21 +559,22 @@
             }
 
             /**
-             * How many update-calls are required to bring `current` to `target`.
-             * @type {integer}
+             * Time to animate from `current` to `target`, when changing `target`.
+             * Will not affect an active animation.
+             * @type {number}
              */
 
         }, {
-            key: 'steps',
+            key: 'animationTime',
             get: function get$$1() {
-                return this._steps;
+                return this._animationTime;
             },
-            set: function set$$1(steps) {
-                if (typeof steps != 'number') throw new TypeError('"steps" must be a number');
+            set: function set$$1(animationTime) {
+                if (typeof animationTime != 'number') throw new TypeError('"animationTime" must be a number');
 
-                this._steps = Math.round(Math.abs(steps));
+                this._animationTime = Math.abs(animationTime);
 
-                if (this._steps === 0 && this.dirty) this.updateImmediate();
+                if (this._animationTime === 0 && this.dirty) this.updateImmediate();
             }
 
             /**
@@ -641,9 +637,8 @@
 
             var _this = possibleConstructorReturn(this, (NumberAttriboot.__proto__ || Object.getPrototypeOf(NumberAttriboot)).apply(this, arguments));
 
-            _this._target = 0;
+            _this._target = null;
             _this._lastTarget = 0;
-            _this._change = 0;
             _this._current = 0;
             _this._previous = 0;
             _this._raw = 0;
@@ -700,7 +695,7 @@
 
             /**
              * Updates `current` if not equal to `target`.
-             * @param {integer} [delta=1] Amount of steps to ease to target.
+             * @param {integer} [delta] Time since last call. If not set, will be calculated.
              * @return {boolean} Returns true, if `current` has been updated.
              */
 
@@ -709,10 +704,10 @@
             value: function update(delta) {
 
                 if (delta === undefined) {
-                    delta = 1;
+                    delta = Date.now() - this._startTime;
                 } else {
 
-                    if (typeof delta != 'number' || delta < 0) throw new TypeError('"delta" must be a number');
+                    if (typeof delta != 'number' || delta < 0) throw new TypeError('"delta" must be a positive number');
 
                     delta = Math.round(Math.abs(delta));
                 }
@@ -720,8 +715,11 @@
                 if (this.dirty) {
 
                     this._previous = this._current;
-                    this._step = Math.min(this._step + delta, this._steps);
-                    this._current = this.easing(this._step, this._start, this._change, this._steps);
+                    this._currentTime += delta;
+
+                    var step = Math.min((this._currentTime - this._startTime) / (this._targetTime - this._startTime), 1);
+
+                    this._current = this.easing(step, this._start, this._target - this._start, 1);
                     this._updated = true;
                 } else {
                     this._updated = false;
@@ -800,11 +798,19 @@
             value: function addOffset(offset) {
                 if (typeof offset != 'number') throw new TypeError('"offset" must be a number');
 
-                if (offset !== 0) {
+                if (!this.locked && offset !== 0) {
 
                     this.target += offset;
-                    this._current += offset;
-                    this._updated = true;
+
+                    // Target may have been clamped
+                    var actualOffset = this._target - this._lastTarget;
+
+                    if (actualOffset !== 0) {
+                        this._start += actualOffset;
+                        this._current += actualOffset;
+                        this._updated = true;
+                        this._triggerUpdate();
+                    }
                 }
             }
 
@@ -825,7 +831,7 @@
 
             /**
              * Set `target` to `stored`.
-             * param {boolean} ignoreLock If true, will restore even if the BaseAttriboot is locked.
+             * param {boolean} ignoreLock If true, will restore even if `locked` is true.
              */
 
         }, {
@@ -885,16 +891,16 @@
                 if (target == this._target) return;
 
                 this._lastTarget = this._target;
-                this._target = target;
 
-                // Setup easing values
                 this._start = this.current;
-                this._change = this._target - this.current;
-                this._step = 0;
+                this._startTime = this._currentTime = Date.now();
+
+                this._target = target;
+                this._targetTime = Date.now() + this._animationTime;
 
                 this._triggerChange();
 
-                if (this.steps === 0) this.updateImmediate();
+                if (this._animationTime === 0) this.updateImmediate();
             }
 
             /**
