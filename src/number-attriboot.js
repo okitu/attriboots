@@ -19,7 +19,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
         super(...arguments);
 
-        this._target = 0;
+        this._target = null;
         this._lastTarget = 0;
         this._current = 0;
         this._previous = 0;
@@ -65,15 +65,16 @@ export default class NumberAttriboot extends BaseAttriboot {
             return;
 
         this._lastTarget = this._target;
-        this._target = target;
 
-        // Setup easing values
         this._start = this.current;
-        this._step = 0;
+        this._startTime = this._currentTime = Date.now();
+
+        this._target = target;
+        this._targetTime = Date.now() + this._animationTime;
 
         this._triggerChange();
 
-        if (this.steps === 0)
+        if (this._animationTime === 0)
             this.updateImmediate();
     }
 
@@ -222,17 +223,17 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * Updates `current` if not equal to `target`.
-     * @param {integer} [delta=1] Amount of steps to ease to target.
+     * @param {integer} [delta] Time since last call. If not set, will be calculated.
      * @return {boolean} Returns true, if `current` has been updated.
      */
     update(delta) {
 
         if (delta === undefined) {
-            delta = 1;
+            delta = Date.now() - this._startTime;
         } else {
 
             if (typeof(delta) != 'number' || delta < 0)
-                throw new TypeError('"delta" must be a number');
+                throw new TypeError('"delta" must be a positive number');
 
             delta = Math.round(Math.abs(delta));
         }
@@ -240,8 +241,11 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (this.dirty) {
 
             this._previous = this._current;
-            this._step = Math.min(this._step + delta, this._steps);
-            this._current = this.easing(this._step, this._start, this._target - this._start, this._steps);
+            this._currentTime += delta;
+
+            var step = Math.min((this._currentTime - this._startTime) / (this._targetTime - this._startTime), 1);
+
+            this._current = this.easing(step, this._start, this._target - this._start, 1);
             this._updated = true;
 
         } else {

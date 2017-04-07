@@ -45,7 +45,7 @@ describe('attriboots', () => {
                 enabled: false,
                 locked: true,
                 ignoreBounds: true,
-                steps: 7
+                animationTime: 100
             });
         });
 
@@ -61,7 +61,7 @@ describe('attriboots', () => {
             expect(testAttriboot.enabled).to.equal(true);
             expect(testAttriboot.locked).to.equal(false);
             expect(testAttriboot.ignoreBounds).to.equal(false);
-            expect(testAttriboot.steps).to.equal(30);
+            expect(testAttriboot.animationTime).to.equal(300);
             expect(testAttriboot.dirty).to.equal(false);
             expect(testAttriboot.updated).to.equal(false);
         });
@@ -82,8 +82,8 @@ describe('attriboots', () => {
             _simpleSetterTests('ignoreBounds', true, 'not-bool');
         });
 
-        describe('.steps', () => {
-            _simpleSetterTests('steps', 123, 'not-number');
+        describe('.animationTime', () => {
+            _simpleSetterTests('animationTime', 123, 'not-number');
         });
 
         describe('.easing', () => {
@@ -160,7 +160,7 @@ describe('attriboots', () => {
             let defaultAttriboot = new NumberAttriboot();
 
             expect(defaultAttriboot.target).to.equal(0);
-            expect(defaultAttriboot.lastTarget).to.equal(0);
+            expect(defaultAttriboot.lastTarget).to.equal(null);
             expect(defaultAttriboot.current).to.equal(0);
             expect(defaultAttriboot.previous).to.equal(0);
             expect(defaultAttriboot.raw).to.equal(0);
@@ -193,8 +193,8 @@ describe('attriboots', () => {
         describe('.target', () => {
             _simpleSetterTests('target', 5, 'not-number');
 
-            it('should #updateImmediate if steps is 0', () => {
-                attriboot.steps = 0;
+            it('should #updateImmediate if animationTime is 0', () => {
+                attriboot.animationTime = 0;
                 attriboot.target = 5;
                 expect(attriboot.updated).to.be.true;
                 expect(attriboot.current).to.equal(5);
@@ -326,27 +326,27 @@ describe('attriboots', () => {
             });
         });
 
-        describe('.steps', () => {
+        describe('.animationTime', () => {
 
             it('should work', () => {
 
-                attriboot.steps = 2;
+                attriboot.animationTime = 2;
                 attriboot.target = 4;
 
                 expect(attriboot.current).to.equal(0);
 
-                expect(attriboot.update()).to.be.true;
+                expect(attriboot.update(1)).to.be.true;
                 expect(attriboot.current).to.equal(2);
 
-                expect(attriboot.update()).to.be.true;
+                expect(attriboot.update(1)).to.be.true;
                 expect(attriboot.current).to.equal(4);
 
                 expect(attriboot.dirty).to.be.false;
             });
 
-            it('should #updateImmediate if steps is changed to 0 and dirty is true', () => {
+            it('should #updateImmediate if animationTime is changed to 0 and dirty is true', () => {
+                attriboot.animationTime = 0;
                 attriboot.target = 5;
-                attriboot.steps = 0;
                 expect(attriboot.updated).to.be.true;
                 expect(attriboot.current).to.equal(5);
             });
@@ -355,33 +355,33 @@ describe('attriboots', () => {
 
         describe('#update', () => {
 
-            it('should work', () => {
+            it('should work with using the delta parameter', () => {
 
                 var updateSpy = sinon.spy();
                 attriboot.addEventListener('update', updateSpy);
 
+                attriboot.animationTime = 3;
                 attriboot.target = 10;
-                attriboot.steps = 3;
 
                 expect(attriboot.current).to.equal(0);
 
-                expect(attriboot.update()).to.be.true;
+                expect(attriboot.update(1)).to.be.true;
                 expect(updateSpy).to.have.callCount(1);
                 expect(attriboot.current).to.be.above(0);
 
-                expect(attriboot.update()).to.be.true;
+                expect(attriboot.update(1)).to.be.true;
                 expect(updateSpy).to.have.callCount(2);
 
-                expect(attriboot.update()).to.be.true;
+                expect(attriboot.update(1)).to.be.true;
                 expect(updateSpy).to.have.callCount(3);
 
-                expect(attriboot.update()).to.be.false;
+                expect(attriboot.update(1)).to.be.false;
                 expect(updateSpy).to.have.callCount(3);
                 expect(attriboot.current).to.equal(10);
                 expect(attriboot.dirty).to.be.false;
             });
 
-            it('should use the delta parameter', () => {
+            it('should work without using the delta parameter', (done) => {
 
                 var updateSpy = sinon.spy();
                 attriboot.addEventListener('update', updateSpy);
@@ -390,14 +390,24 @@ describe('attriboots', () => {
                     attriboot.update('not-number');
                 }).to.throw(Error);
 
-                attriboot.steps = 1000;
+                attriboot.animationTime = 200;
                 attriboot.target = 4;
 
-                expect(attriboot.current).to.equal(0);
-                expect(attriboot.update(200)).to.be.true;
-                expect(attriboot.update(800)).to.be.true;
-                expect(attriboot.dirty).to.be.false;
-                expect(attriboot.update(100)).to.be.false;
+                setTimeout(function() {
+
+                    expect(attriboot.update()).to.be.true;
+                    setTimeout(function() {
+
+                        expect(attriboot.update()).to.be.true;
+                        setTimeout(function() {
+
+                            expect(attriboot.update()).to.be.false;
+                            expect(attriboot.dirty).to.be.false;
+
+                            done();
+                        }, 100);
+                    }, 100);
+                }, 100);
 
             });
         });
@@ -410,7 +420,6 @@ describe('attriboots', () => {
                 attriboot.addEventListener('update', updateSpy);
 
                 attriboot.target = 10;
-                attriboot.steps = 3;
 
                 expect(attriboot.current).to.equal(0);
 
@@ -428,7 +437,6 @@ describe('attriboots', () => {
 
             it('should work', () => {
                 attriboot.target = 10;
-                attriboot.steps = 3;
 
                 expect(attriboot.current).to.equal(0);
                 expect(attriboot.stop()).to.be.true;

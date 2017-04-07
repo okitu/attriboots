@@ -12,7 +12,7 @@ export default class BaseAttriboot {
         id: id = null,
         enabled: enabled = true,
         ignoreBounds: ignoreBounds = false,
-        steps: steps = 30,
+        animationTime: animationTime = 300,
         easing: easing = Easing.outQuad,
         locked: locked = false
 
@@ -26,7 +26,7 @@ export default class BaseAttriboot {
         this.enabled = enabled;
         this.locked = locked;
         this.ignoreBounds = ignoreBounds;
-        this.steps = steps;
+        this.animationTime = animationTime;
         this.easing = easing;
 
         this._updated = false;
@@ -109,20 +109,21 @@ export default class BaseAttriboot {
     }
 
     /**
-     * How many update-calls are required to bring `current` to `target`.
-     * @type {integer}
+     * Time to animate from `current` to `target`, when changing `target`.
+     * Will not affect an active animation.
+     * @type {number}
      */
-    get steps() {
-        return this._steps;
+    get animationTime() {
+        return this._animationTime;
     }
 
-    set steps(steps) {
-        if (typeof(steps) != 'number')
-            throw new TypeError('"steps" must be a number');
+    set animationTime(animationTime) {
+        if (typeof(animationTime) != 'number')
+            throw new TypeError('"animationTime" must be a number');
 
-        this._steps = Math.round(Math.abs(steps));
+        this._animationTime = Math.abs(animationTime);
 
-        if (this._steps === 0 && this.dirty)
+        if (this._animationTime === 0 && this.dirty)
             this.updateImmediate();
     }
 
@@ -157,10 +158,7 @@ export default class BaseAttriboot {
     /**
      * Updates `current` if not equal to `target`.
      * 
-     * Tip: By using milliseconds for `delta` and
-     * the `steps`property, timed-based updating is possible.
-     * 
-     * @param {integer} [delta=1] Amount of steps to ease to target.
+     * @param {integer} [delta] Time since last call. If not set, will be calculated.
      * @return Returns true, if `current` has been updated.
      */
     update() {
@@ -169,7 +167,6 @@ export default class BaseAttriboot {
 
     /**
      * Set the `current` to `target`.
-     *
      * @return Returns true, if `current` has been updated.
      */
     updateImmediate() {
@@ -178,7 +175,6 @@ export default class BaseAttriboot {
 
     /**
      * Sets `target` to `current`.
-     *
      * @return Returns true, if `target` has been updated.
      */
     stop() {
