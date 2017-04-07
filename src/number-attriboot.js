@@ -316,11 +316,19 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (typeof(offset) != 'number')
             throw new TypeError('"offset" must be a number');
 
-        if (offset !== 0) {
+        if (!this.locked && offset !== 0) {
 
             this.target += offset;
-            this._current += offset;
-            this._updated = true;
+
+            // Target may have been clamped
+            var actualOffset = this._target - this._lastTarget;
+
+            if (actualOffset !== 0) {
+                this._start += actualOffset;
+                this._current += actualOffset;
+                this._updated = true;
+                this._triggerUpdate();
+            }
         }
     }
 
