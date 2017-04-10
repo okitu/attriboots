@@ -1,7 +1,7 @@
 /* eslint-env node, mocha */
 
 import chai from 'chai';
-import sinon from 'sinon';
+// import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 // use 'expect' & sinon-chai
@@ -11,7 +11,7 @@ chai.use(sinonChai);
 // Import the classes.
 import AngleAttriboot from '../src/angle-attriboot';
 
-describe.only('attriboots', () => {
+describe('attriboots', () => {
 
     let attriboot;
 
