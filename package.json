@@ -17,7 +17,7 @@
     "compile:uglify": "uglifyjs dist/attriboots.js --compress --mangle --comments --screw-ie8 --output dist/attriboots.min.js",
     "test": "npm run test:lint && npm run test:unit",
     "test:lint": "eslint ./src",
-    "test:unit": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text mocha test/test.js"
+    "test:unit": "cross-env NODE_ENV=test nyc --reporter=lcov --reporter=text mocha test/*.js"
   },
   "repository": {
     "type": "git",
