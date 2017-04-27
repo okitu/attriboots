@@ -848,21 +848,6 @@
                 this.target = this.stored;
                 this._locked = lockBefore;
             }
-
-            // toString() {
-            //     var str: String = "NumberAttriboot( ";
-
-            //     if (_id)
-            //         str += "id: " + id + ", "
-
-            //     str += "target=" + target + ", ";
-            //     str += "value = " + value + ", ";
-            //     str += "min = " + min + ", ";
-            //     str += "max = " + max + " )";
-
-            //     return str;
-            // }
-
         }, {
             key: 'raw',
             get: function get$$1() {
@@ -1034,8 +1019,182 @@
         return NumberAttriboot;
     }(BaseAttriboot);
 
+    /**
+     * @author David Schäfer, me@okitu.de
+     */
+
+    var AngleAttriboot = function(_NumberAttriboot) {
+        inherits(AngleAttriboot, _NumberAttriboot);
+
+        function AngleAttriboot() {
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref$shortRotation = _ref.shortRotation,
+                shortRotation = _ref$shortRotation === undefined ? false : _ref$shortRotation,
+                _ref$wrap = _ref.wrap,
+                wrap = _ref$wrap === undefined ? false : _ref$wrap;
+
+            classCallCheck(this, AngleAttriboot);
+
+            var _this = possibleConstructorReturn(this, (AngleAttriboot.__proto__ || Object.getPrototypeOf(AngleAttriboot)).apply(this, arguments));
+
+            _this._shortRotation = shortRotation;
+            _this._wrap = wrap;
+            return _this;
+        }
+
+        /**
+         * @override
+         */
+
+        createClass(AngleAttriboot, [{
+            key: 'getTargetRadians',
+
+            /**
+             * Get the `target` in radians.
+             * @return {number}
+             */
+            value: function getTargetRadians() {
+                return this.target * Math.PI / 180;
+            }
+
+            /**
+             * Get the `current` in radians.
+             * @return {number}
+             */
+
+        }, {
+            key: 'getCurrentRadians',
+            value: function getCurrentRadians() {
+                return this.current * Math.PI / 180;
+            }
+
+            //
+            // Private methods
+            // --------------------------------------------------
+
+            /**
+             * Fixes illogical rotation behavior. When the angle is internally at -30° and
+             * gets set to 350°, this would cause a rotation around 380° when logically
+             * only 20° would be necessary.
+             * @private
+             */
+
+        }, {
+            key: '_applyShortRotation',
+            value: function _applyShortRotation() {
+                // fix for short rotation
+                while (this._start - this._target > 180) {
+                    this._start -= 360;
+                }
+                while (this._start - this._target < -180) {
+                    this._start += 360;
+                }
+            }
+
+            /**
+             * Wraps the given degree-value to 0-360°.
+             * @param {number} angle
+             * @return {number}
+             * @private
+             */
+
+        }, {
+            key: '_wrapTo360',
+            value: function _wrapTo360(angle) {
+                if (angle > 360) return angle % 360;
+
+                while (angle < 0) {
+                    angle += 360;
+                }
+
+                return angle;
+            }
+        }, {
+            key: 'current',
+            get: function get$$1() {
+                return this._wrap ? this._wrapTo360(this._current) : this._current;
+            }
+
+            /**
+             * @override
+             */
+
+        }, {
+            key: 'target',
+            get: function get$$1() {
+                    return this._wrap ? this._wrapTo360(this._target) : this._target;
+                }
+
+                /**
+                 * @override
+                 */
+                ,
+            set: function set$$1(target) {
+                if (typeof target != 'number') throw new TypeError('"target" must be a number');
+
+                if (this._locked) return;
+
+                this._raw = target;
+
+                if (!this._ignoreBounds) target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax);
+
+                if (target == this._target) return;
+
+                this._lastTarget = this._target;
+
+                this._start = this.current;
+                this._startTime = this._currentTime = Date.now();
+
+                this._target = target;
+                this._targetTime = Date.now() + this._animationTime;
+
+                if (this._wrap && this._shortRotation) this._applyShortRotation();
+
+                this._triggerChange();
+
+                if (this._animationTime === 0) this.updateImmediate();
+            }
+
+            /**
+             * If true, `target`and `current`will be wrapped between 0° and 360°.
+             * For example if 540° will be wrapped to 180° and -120° to 240°.
+             * @type {boolean}
+             */
+
+        }, {
+            key: 'wrap',
+            get: function get$$1() {
+                return this._wrap;
+            },
+            set: function set$$1(wrap) {
+                if (typeof wrap != 'boolean') throw new TypeError('"wrap" must be a boolean');
+
+                this._wrap = wrap;
+            }
+
+            /**
+             * If wrap & shortRotation is true, fixes illogical rotation behavior. When the angle is internally at -30° and
+             * gets set to 350°, this would cause a rotation around 380° when logically only 20° would be necessary.
+             * @type {boolean}
+             */
+
+        }, {
+            key: 'shortRotation',
+            get: function get$$1() {
+                return this._shortRotation;
+            },
+            set: function set$$1(shortRotation) {
+                if (typeof shortRotation != 'boolean') throw new TypeError('"shortRotation" must be a boolean');
+
+                this._shortRotation = shortRotation;
+            }
+        }]);
+        return AngleAttriboot;
+    }(NumberAttriboot);
+
     exports.Easing = Easing;
     exports.NumberAttriboot = NumberAttriboot;
+    exports.AngleAttriboot = AngleAttriboot;
 
     Object.defineProperty(exports, '__esModule', {
         value: true
