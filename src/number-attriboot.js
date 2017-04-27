@@ -360,17 +360,4 @@ export default class NumberAttriboot extends BaseAttriboot {
         this._locked = lockBefore;
     }
 
-    // toString() {
-    //     var str: String = "NumberAttriboot( ";
-
-    //     if (_id)
-    //         str += "id: " + id + ", "
-
-    //     str += "target=" + target + ", ";
-    //     str += "value = " + value + ", ";
-    //     str += "min = " + min + ", ";
-    //     str += "max = " + max + " )";
-
-    //     return str;
-    // }
 }
