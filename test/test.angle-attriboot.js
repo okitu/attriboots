@@ -54,6 +54,23 @@ describe('attriboots', () => {
             expect(attriboot.shortRotation).to.equal(true);
         });
 
+        describe('.target', () => {
+            _simpleSetterTests('target', 1, 'not-number');
+
+            it('should work', () => {
+
+                attriboot.animationTime = 0;
+                attriboot.target = 10;
+                expect(attriboot.target).to.equal(10);
+                expect(attriboot.current).to.equal(10);
+                
+                attriboot.locked = true;
+                attriboot.target = 20;
+                expect(attriboot.target).to.equal(10);
+
+            });
+        });
+
         describe('.wrap', () => {
             _simpleSetterTests('wrap', true, 'not-bool');
 
