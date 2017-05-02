@@ -2,7 +2,7 @@
   "name": "attriboots",
   "description": "",
   "homepage": "https://github.com/okitu/attriboots",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "dist/attriboots.js",
   "author": {
     "name": "David Schäfer",

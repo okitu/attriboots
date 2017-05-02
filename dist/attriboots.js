@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.4
+ * attriboots@0.0.5
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -922,7 +922,8 @@
             }
 
             /**
-             * The minimum allowed `target`
+             * The minimum allowed `target`.
+             * IF set to `null`or `undefined` will be set to negative infinity.
              * @type {number}
              */
 
@@ -932,6 +933,8 @@
                 return this._min;
             },
             set: function set$$1(min) {
+                if (min === null || min === undefined) min = Number.NEGATIVE_INFINITY;
+
                 if (typeof min != 'number') throw new TypeError('"min" must be a number');
 
                 // min may not be greater than max
@@ -946,7 +949,8 @@
             }
 
             /**
-             * The maximum allowed `target`
+             * The maximum allowed `target`.
+             * IF set to `null`or `undefined` will be set to positive infinity.
              * @type {number}
              */
 
@@ -956,6 +960,8 @@
                 return this._max;
             },
             set: function set$$1(max) {
+                if (max === null || max === undefined) max = Number.POSITIVE_INFINITY;
+
                 if (typeof max != 'number') throw new TypeError('"max" must be a number');
 
                 // may not be less than min
