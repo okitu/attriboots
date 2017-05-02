@@ -107,6 +107,22 @@ describe('attriboots', () => {
         describe('.min', () => {
             _simpleSetterTests('min', 3, 'not-number');
 
+            it('should be set to Number.NEGATIVE_INFINITY if assign null or undefined', () => {
+
+                attriboot.min = 10;
+                expect(attriboot.min).to.equal(10);
+
+                attriboot.min = null;
+                expect(attriboot.min).to.equal(Number.NEGATIVE_INFINITY);
+
+                attriboot.min = 10;
+                expect(attriboot.min).to.equal(10);
+
+                attriboot.min = undefined;
+                expect(attriboot.min).to.equal(Number.NEGATIVE_INFINITY);
+
+            });
+
             it('should ensure target is greater or equal than min', () => {
 
                 attriboot.min = 10;
@@ -141,6 +157,22 @@ describe('attriboots', () => {
 
         describe('.max', () => {
             _simpleSetterTests('max', 3, 'not-number');
+
+            it('should be set to Number.POSITIVE_INFINITY if assign null or undefined', () => {
+
+                attriboot.max = 10;
+                expect(attriboot.max).to.equal(10);
+
+                attriboot.max = null;
+                expect(attriboot.max).to.equal(Number.POSITIVE_INFINITY);
+
+                attriboot.max = 10;
+                expect(attriboot.max).to.equal(10);
+
+                attriboot.max = undefined;
+                expect(attriboot.max).to.equal(Number.POSITIVE_INFINITY);
+
+            });
 
             it('should ensure target less or equal than max', () => {
                 attriboot.target = 10;

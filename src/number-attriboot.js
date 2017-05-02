@@ -103,7 +103,8 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     /**
-     * The minimum allowed `target`
+     * The minimum allowed `target`.
+     * IF set to `null`or `undefined` will be set to negative infinity.
      * @type {number}
      */
     get min() {
@@ -111,6 +112,9 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     set min(min) {
+        if (min === null || min === undefined)
+            min = Number.NEGATIVE_INFINITY;
+
         if (typeof(min) != 'number')
             throw new TypeError('"min" must be a number');
 
@@ -126,7 +130,8 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     /**
-     * The maximum allowed `target`
+     * The maximum allowed `target`.
+     * IF set to `null`or `undefined` will be set to positive infinity.
      * @type {number}
      */
     get max() {
@@ -134,6 +139,9 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     set max(max) {
+        if (max === null || max === undefined)
+            max = Number.POSITIVE_INFINITY;
+
         if (typeof(max) != 'number')
             throw new TypeError('"max" must be a number');
 
