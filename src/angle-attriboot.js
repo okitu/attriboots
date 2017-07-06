@@ -62,7 +62,7 @@ export default class AngleAttriboot extends NumberAttriboot {
         if (this._wrap && this._shortRotation)
             this._applyShortRotation();
 
-        this._triggerChange();
+        this._triggerChange('target', this._target);
 
         if (this._animationTime === 0)
             this.updateImmediate();
@@ -81,7 +81,11 @@ export default class AngleAttriboot extends NumberAttriboot {
         if (typeof(wrap) != 'boolean')
             throw new TypeError('"wrap" must be a boolean');
 
+        if (wrap == this._wrap)
+            return;
+
         this._wrap = wrap;
+        this._triggerChange('wrap', this._wrap);
     }
 
     /**
@@ -97,7 +101,11 @@ export default class AngleAttriboot extends NumberAttriboot {
         if (typeof(shortRotation) != 'boolean')
             throw new TypeError('"shortRotation" must be a boolean');
 
+        if (shortRotation == this._shortRotation)
+            return;
+
         this._shortRotation = shortRotation;
+        this._triggerChange('shortRotation', this._shortRotation);
     }
 
     /**

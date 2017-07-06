@@ -1,7 +1,7 @@
 /* eslint-env node, mocha */
 
 import chai from 'chai';
-// import sinon from 'sinon';
+import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 // use 'expect' & sinon-chai
@@ -16,15 +16,35 @@ describe('attriboots', () => {
     let attriboot;
 
     // Helper for easy set-tests
-    let _simpleSetterTests = (field, value, badValue) => {
-        it('can be changed', () => {
-            attriboot[field] = value;
-            expect(attriboot[field]).to.equal(value);
+    let _simpleSetterTests = (property, value, badValue) => {
+        it('can be changed and fires change events', () => {
+
+            var changeEventSpy = sinon.spy();
+            attriboot.addEventListener('change', changeEventSpy);
+            var propertyChangeEventSpy = sinon.spy();
+            attriboot.addEventListener('change:' + property, propertyChangeEventSpy);
+
+            attriboot[property] = value;
+            expect(attriboot[property]).to.equal(value);
+
+            expect(changeEventSpy).to.have.callCount(1);
+            expect(changeEventSpy).to.have.been.calledWith({
+                type: 'change',
+                target: attriboot,
+                property: property,
+                value: value
+            });
+            expect(propertyChangeEventSpy).to.have.callCount(1);
+            expect(propertyChangeEventSpy).to.have.been.calledWith({
+                type: 'change:' + property,
+                target: attriboot,
+                value: value
+            });
         });
 
         it('only accepts correct values', () => {
             expect(() => {
-                attriboot[field] = badValue;
+                attriboot[property] = badValue;
             }).to.throw(Error);
         });
     };

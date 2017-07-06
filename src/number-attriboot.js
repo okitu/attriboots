@@ -72,7 +72,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         this._target = target;
         this._targetTime = Date.now() + this._animationTime;
 
-        this._triggerChange();
+        this._triggerChange('target', this._target);
 
         if (this._animationTime === 0)
             this.updateImmediate();
@@ -121,10 +121,14 @@ export default class NumberAttriboot extends BaseAttriboot {
         // min may not be greater than max
         if (min >= this._max) {
             // respect exclusiveMax
-            this._min = (this.exclusiveMax) ? this.max - Number.MIN_VALUE : this.max;
-        } else {
-            this._min = min;
+            min = (this.exclusiveMax) ? this.max - Number.MIN_VALUE : this.max;
         }
+
+        if (min == this._min)
+            return;
+
+        this._min = min;
+        this._triggerChange('min', this._min);
 
         this.target = this._raw;
     }
@@ -148,10 +152,14 @@ export default class NumberAttriboot extends BaseAttriboot {
         // may not be less than min
         if (max <= this._min) {
             // respect exclusiveMin
-            this._max = (this.exclusiveMin) ? this.min + Number.MIN_VALUE : this.min;
-        } else {
-            this._max = max;
+            max = (this.exclusiveMin) ? this.min + Number.MIN_VALUE : this.min;
         }
+
+        if (max == this._max)
+            return;
+
+        this._max = max;
+        this._triggerChange('max', this._max);
 
         this.target = this._raw;
     }
@@ -170,6 +178,7 @@ export default class NumberAttriboot extends BaseAttriboot {
             throw new TypeError('"exclusiveMin" must be a boolean');
 
         this._exclusiveMin = exclusiveMin;
+        this._triggerChange('exclusiveMin', this._exclusiveMin);
         this.target = this._raw;
     }
 
@@ -186,7 +195,11 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (typeof(exclusiveMax) != 'boolean')
             throw new TypeError('"exclusiveMax" must be a boolean');
 
+        if (exclusiveMax == this._exclusiveMax)
+            return;
+
         this._exclusiveMax = exclusiveMax;
+        this._triggerChange('exclusiveMax', this._exclusiveMax);
         this.target = this._raw;
     }
 

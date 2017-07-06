@@ -23,15 +23,35 @@ describe('attriboots', () => {
     let attriboot;
 
     // Helper for easy set-tests
-    let _simpleSetterTests = (field, value, badValue) => {
-        it('can be changed', () => {
-            attriboot[field] = value;
-            expect(attriboot[field]).to.equal(value);
+    let _simpleSetterTests = (property, value, badValue) => {
+        it('can be changed and fires change events', () => {
+
+            var changeEventSpy = sinon.spy();
+            attriboot.addEventListener('change', changeEventSpy);
+            var propertyChangeEventSpy = sinon.spy();
+            attriboot.addEventListener('change:' + property, propertyChangeEventSpy);
+
+            attriboot[property] = value;
+            expect(attriboot[property]).to.equal(value);
+
+            expect(changeEventSpy).to.have.callCount(1);
+            expect(changeEventSpy).to.have.been.calledWith({
+                type: 'change',
+                target: attriboot,
+                property: property,
+                value: value
+            });
+            expect(propertyChangeEventSpy).to.have.callCount(1);
+            expect(propertyChangeEventSpy).to.have.been.calledWith({
+                type: 'change:' + property,
+                target: attriboot,
+                value: value
+            });
         });
 
         it('only accepts correct values', () => {
             expect(() => {
-                attriboot[field] = badValue;
+                attriboot[property] = badValue;
             }).to.throw(Error);
         });
     };
@@ -61,6 +81,7 @@ describe('attriboots', () => {
             expect(testAttriboot.locked).to.equal(false);
             expect(testAttriboot.ignoreBounds).to.equal(false);
             expect(testAttriboot.animationTime).to.equal(300);
+            expect(testAttriboot.easing).to.equal(BaseAttriboot.Easing.outQuad);
             expect(testAttriboot.dirty).to.equal(false);
             expect(testAttriboot.updated).to.equal(false);
         });
@@ -74,11 +95,11 @@ describe('attriboots', () => {
         });
 
         describe('.locked', () => {
-            _simpleSetterTests('locked', true, 'not-bool');
+            _simpleSetterTests('locked', false, 'not-bool');
         });
 
         describe('.ignoreBounds', () => {
-            _simpleSetterTests('ignoreBounds', true, 'not-bool');
+            _simpleSetterTests('ignoreBounds', false, 'not-bool');
         });
 
         describe('.animationTime', () => {
@@ -87,7 +108,7 @@ describe('attriboots', () => {
 
         describe('.easing', () => {
             expect(TestAttriboot.Easing).to.exist;
-            _simpleSetterTests('easing', TestAttriboot.Easing.inOutQuad, 'not-function');
+            _simpleSetterTests('easing', BaseAttriboot.Easing.inOutQuad, 'not-function');
         });
 
         describe('#update', () => {
@@ -120,19 +141,19 @@ describe('attriboots', () => {
                 attriboot.dispatchEvent({
                     type: 'test'
                 });
-                expect(eventSpy).to.have.been.callCount(0);
+                expect(eventSpy).to.have.callCount(0);
 
                 attriboot.addEventListener('test', eventSpy);
 
                 attriboot.dispatchEvent({
                     type: 'test'
                 });
-                expect(eventSpy).to.have.been.callCount(1);
+                expect(eventSpy).to.have.callCount(1);
 
                 attriboot.dispatchEvent({
                     type: 'unknown'
                 });
-                expect(eventSpy).to.have.been.callCount(1);
+                expect(eventSpy).to.have.callCount(1);
 
                 attriboot.removeEventListener('test', eventSpy);
                 attriboot.removeEventListener('unknown', eventSpy);
@@ -140,11 +161,11 @@ describe('attriboots', () => {
                 attriboot.dispatchEvent({
                     type: 'test'
                 });
-                expect(eventSpy).to.have.been.callCount(1);
+                expect(eventSpy).to.have.callCount(1);
             });
 
         });
-        
+
     });
 
 });

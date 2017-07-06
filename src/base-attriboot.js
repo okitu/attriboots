@@ -50,9 +50,13 @@ export default class BaseAttriboot {
 
     set id(id) {
         if (typeof(id) != 'string')
-            throw new TypeError('"id" must be a number');
+            throw new TypeError('"id" must be a string');
+
+        if (id == this._id)
+            return;
 
         this._id = id;
+        this._triggerChange('id', this._id);
     }
 
     /**
@@ -75,7 +79,12 @@ export default class BaseAttriboot {
         if (typeof(enabled) != 'boolean')
             throw new TypeError('"enabled" must be a boolean');
 
+        if (enabled == this._enabled) {
+            return;
+        }
+
         this._enabled = enabled;
+        this._triggerChange('enabled', this._enabled);
     }
 
     /**
@@ -90,7 +99,11 @@ export default class BaseAttriboot {
         if (typeof(ignoreBounds) != 'boolean')
             throw new TypeError('"ignoreBounds" must be a boolean');
 
+        if (ignoreBounds == this._ignoreBounds)
+            return;
+
         this._ignoreBounds = ignoreBounds;
+        this._triggerChange('ignoreBounds', this._ignoreBounds);
     }
 
     /**
@@ -105,7 +118,11 @@ export default class BaseAttriboot {
         if (typeof(locked) != 'boolean')
             throw new TypeError('"locked" must be a boolean');
 
+        if (locked == this._locked)
+            return;
+
         this._locked = locked;
+        this._triggerChange('locked', this._locked);
     }
 
     /**
@@ -121,7 +138,11 @@ export default class BaseAttriboot {
         if (typeof(animationTime) != 'number')
             throw new TypeError('"animationTime" must be a number');
 
+        if (animationTime == this._animationTime)
+            return;
+
         this._animationTime = Math.abs(animationTime);
+        this._triggerChange('animationTime', this._animationTime);
 
         if (this._animationTime === 0 && this.dirty)
             this.updateImmediate();
@@ -140,7 +161,11 @@ export default class BaseAttriboot {
         if (typeof(easing) != 'function')
             throw new TypeError('"easing" must be a function!');
 
+        if (easing == this._easing)
+            return;
+
         this._easing = easing;
+        this._triggerChange('easing', this._easing);
     }
 
     /**
@@ -247,20 +272,35 @@ export default class BaseAttriboot {
 
     /**
      * Dispatch a 'change' event.
+     * @param  {string} property  The name of the property that changed
+     * @param  {object} value The new value of the changed property
      * @protected
      */
-    _triggerChange() {
+    _triggerChange(property, value) {
 
         /**
          * Change event.
-         * Dispatched when `target` changes.
+         * Dispatched when any property changes.
          *
          * @event change
          * @type {object}
          */
         this.dispatchEvent({
             type: 'change',
-            value: this._target
+            property: property,
+            value: value
+        });
+
+        /**
+         * Property change event.
+         * Dispatched when a property changes.
+         *
+         * @event change:*
+         * @type {object}
+         */
+        this.dispatchEvent({
+            type: 'change:' + property,
+            value: value
         });
     }
 
