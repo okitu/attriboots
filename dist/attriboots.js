@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.5
+ * attriboots@0.0.6
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -464,23 +464,38 @@
 
             /**
              * Dispatch a 'change' event.
+             * @param  {string} property  The name of the property that changed
+             * @param  {object} value The new value of the changed property
              * @protected
              */
 
         }, {
             key: '_triggerChange',
-            value: function _triggerChange() {
+            value: function _triggerChange(property, value) {
 
                 /**
                  * Change event.
-                 * Dispatched when `target` changes.
+                 * Dispatched when any property changes.
                  *
                  * @event change
                  * @type {object}
                  */
                 this.dispatchEvent({
                     type: 'change',
-                    value: this._target
+                    property: property,
+                    value: value
+                });
+
+                /**
+                 * Property change event.
+                 * Dispatched when a property changes.
+                 *
+                 * @event change:*
+                 * @type {object}
+                 */
+                this.dispatchEvent({
+                    type: 'change:' + property,
+                    value: value
                 });
             }
         }, {
@@ -494,9 +509,12 @@
                 return this._id;
             },
             set: function set$$1(id) {
-                if (typeof id != 'string') throw new TypeError('"id" must be a number');
+                if (typeof id != 'string') throw new TypeError('"id" must be a string');
+
+                if (id == this._id) return;
 
                 this._id = id;
+                this._triggerChange('id', this._id);
             }
 
             /**
@@ -523,7 +541,12 @@
             set: function set$$1(enabled) {
                 if (typeof enabled != 'boolean') throw new TypeError('"enabled" must be a boolean');
 
+                if (enabled == this._enabled) {
+                    return;
+                }
+
                 this._enabled = enabled;
+                this._triggerChange('enabled', this._enabled);
             }
 
             /**
@@ -539,7 +562,10 @@
             set: function set$$1(ignoreBounds) {
                 if (typeof ignoreBounds != 'boolean') throw new TypeError('"ignoreBounds" must be a boolean');
 
+                if (ignoreBounds == this._ignoreBounds) return;
+
                 this._ignoreBounds = ignoreBounds;
+                this._triggerChange('ignoreBounds', this._ignoreBounds);
             }
 
             /**
@@ -555,7 +581,10 @@
             set: function set$$1(locked) {
                 if (typeof locked != 'boolean') throw new TypeError('"locked" must be a boolean');
 
+                if (locked == this._locked) return;
+
                 this._locked = locked;
+                this._triggerChange('locked', this._locked);
             }
 
             /**
@@ -572,7 +601,10 @@
             set: function set$$1(animationTime) {
                 if (typeof animationTime != 'number') throw new TypeError('"animationTime" must be a number');
 
+                if (animationTime == this._animationTime) return;
+
                 this._animationTime = Math.abs(animationTime);
+                this._triggerChange('animationTime', this._animationTime);
 
                 if (this._animationTime === 0 && this.dirty) this.updateImmediate();
             }
@@ -591,7 +623,10 @@
             set: function set$$1(easing) {
                 if (typeof easing != 'function') throw new TypeError('"easing" must be a function!');
 
+                if (easing == this._easing) return;
+
                 this._easing = easing;
+                this._triggerChange('easing', this._easing);
             }
 
             /**
@@ -883,7 +918,7 @@
                 this._target = target;
                 this._targetTime = Date.now() + this._animationTime;
 
-                this._triggerChange();
+                this._triggerChange('target', this._target);
 
                 if (this._animationTime === 0) this.updateImmediate();
             }
@@ -940,10 +975,13 @@
                 // min may not be greater than max
                 if (min >= this._max) {
                     // respect exclusiveMax
-                    this._min = this.exclusiveMax ? this.max - Number.MIN_VALUE : this.max;
-                } else {
-                    this._min = min;
+                    min = this.exclusiveMax ? this.max - Number.MIN_VALUE : this.max;
                 }
+
+                if (min == this._min) return;
+
+                this._min = min;
+                this._triggerChange('min', this._min);
 
                 this.target = this._raw;
             }
@@ -967,10 +1005,13 @@
                 // may not be less than min
                 if (max <= this._min) {
                     // respect exclusiveMin
-                    this._max = this.exclusiveMin ? this.min + Number.MIN_VALUE : this.min;
-                } else {
-                    this._max = max;
+                    max = this.exclusiveMin ? this.min + Number.MIN_VALUE : this.min;
                 }
+
+                if (max == this._max) return;
+
+                this._max = max;
+                this._triggerChange('max', this._max);
 
                 this.target = this._raw;
             }
@@ -990,6 +1031,7 @@
                 if (typeof exclusiveMin != 'boolean') throw new TypeError('"exclusiveMin" must be a boolean');
 
                 this._exclusiveMin = exclusiveMin;
+                this._triggerChange('exclusiveMin', this._exclusiveMin);
                 this.target = this._raw;
             }
 
@@ -1007,7 +1049,10 @@
             set: function set$$1(exclusiveMax) {
                 if (typeof exclusiveMax != 'boolean') throw new TypeError('"exclusiveMax" must be a boolean');
 
+                if (exclusiveMax == this._exclusiveMax) return;
+
                 this._exclusiveMax = exclusiveMax;
+                this._triggerChange('exclusiveMax', this._exclusiveMax);
                 this.target = this._raw;
             }
 
@@ -1156,7 +1201,7 @@
 
                 if (this._wrap && this._shortRotation) this._applyShortRotation();
 
-                this._triggerChange();
+                this._triggerChange('target', this._target);
 
                 if (this._animationTime === 0) this.updateImmediate();
             }
@@ -1175,7 +1220,10 @@
             set: function set$$1(wrap) {
                 if (typeof wrap != 'boolean') throw new TypeError('"wrap" must be a boolean');
 
+                if (wrap == this._wrap) return;
+
                 this._wrap = wrap;
+                this._triggerChange('wrap', this._wrap);
             }
 
             /**
@@ -1192,7 +1240,10 @@
             set: function set$$1(shortRotation) {
                 if (typeof shortRotation != 'boolean') throw new TypeError('"shortRotation" must be a boolean');
 
+                if (shortRotation == this._shortRotation) return;
+
                 this._shortRotation = shortRotation;
+                this._triggerChange('shortRotation', this._shortRotation);
             }
         }]);
         return AngleAttriboot;
