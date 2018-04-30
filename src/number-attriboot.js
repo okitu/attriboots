@@ -9,9 +9,10 @@ export default class NumberAttriboot extends BaseAttriboot {
 
             target: target = 0,
             min: min = Number.NEGATIVE_INFINITY,
-            exclusiveMin: exclusiveMin = false,
             max: max = Number.POSITIVE_INFINITY,
-            exclusiveMax: exclusiveMax = false
+            exclusiveMin: exclusiveMin = false,
+            exclusiveMax: exclusiveMax = false,
+            exclusivePrecision: exclusivePrecision = Math.pow(10, -16)
 
         } = {}
 
@@ -27,9 +28,10 @@ export default class NumberAttriboot extends BaseAttriboot {
         this._stored = 0;
 
         this.min = min;
-        this.exclusiveMin = exclusiveMin;
         this.max = max;
+        this.exclusiveMin = exclusiveMin;
         this.exclusiveMax = exclusiveMax;
+        this.exclusivePrecision = exclusivePrecision;
 
         this.apply(target);
     }
@@ -59,7 +61,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         this._raw = target;
 
         if (!this._ignoreBounds)
-            target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax);
+            target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax, this._exclusivePrecision);
 
         if (target == this._target)
             return;
@@ -121,7 +123,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         // min may not be greater than max
         if (min >= this._max) {
             // respect exclusiveMax
-            min = (this.exclusiveMax) ? this.max - Number.MIN_VALUE : this.max;
+            min = (this.exclusiveMax) ? this.max - this.exclusivePrecision : this.max;
         }
 
         if (min == this._min)
@@ -152,7 +154,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         // may not be less than min
         if (max <= this._min) {
             // respect exclusiveMin
-            max = (this.exclusiveMin) ? this.min + Number.MIN_VALUE : this.min;
+            max = (this.exclusiveMin) ? this.min + this.exclusivePrecision : this.min;
         }
 
         if (max == this._max)
@@ -166,7 +168,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * If true, `min` will be an exclusive minimum, meaning `target` and `currebnt`
-     * will always be larger by `Number.MIN_VALUE` and never equal to max.
+     * will always be larger by `exclusivePrecision` and never equal to max.
      * @type {boolean}
      */
     get exclusiveMin() {
@@ -177,6 +179,9 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (typeof(exclusiveMin) != 'boolean')
             throw new TypeError('"exclusiveMin" must be a boolean');
 
+        if (exclusiveMin == this._exclusiveMin)
+            return;
+
         this._exclusiveMin = exclusiveMin;
         this._triggerChange('exclusiveMin', this._exclusiveMin);
         this.target = this._raw;
@@ -184,7 +189,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * If true, max will be an exclusive maximum, meaning `target` and `current`
-     * will always be smaller by `Number.MIN_VALUE` and never equal to `max`.
+     * will always be smaller by `exclusivePrecision` and never equal to `max`.
      * @type {boolean}
      */
     get exclusiveMax() {
@@ -204,6 +209,28 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     /**
+     * If `exclusiveMin` or `exclusiveMax` is true, and a value has to be clamped,
+     * the result will always be `exclusivePrecision` larger than `min` and
+     * `exclusivePrecision` smaller than `max`.
+     * Defaults to 10^-16.
+     * @type {number}
+     */
+    get exclusivePrecision() {
+        return this._exclusivePrecision;
+    }
+
+    set exclusivePrecision(exclusivePrecision) {
+        if (typeof(exclusivePrecision) != 'number')
+            throw new TypeError('"exclusivePrecision" must be a number');
+
+        if (exclusivePrecision == this._exclusivePrecision)
+            return;
+
+        this._exclusivePrecision = exclusivePrecision;
+        this._triggerChange('exclusivePrecision', this._exclusivePrecision);
+    }
+
+    /**
      * A reference, that can be used to store a value for whatever reason.
      * @type {number}
      */
@@ -220,20 +247,21 @@ export default class NumberAttriboot extends BaseAttriboot {
      * @param {number} value
      * @param {number} min
      * @param {number} max
-     * @param {boolean} exclusiveMin If true will return a Number the is `Number.MIN_VALUE` larger than `min`.
-     * @param {boolean} exclusiveMax If true will return a Number the is `Number.MIN_VALUE` smaller than `max`.
+     * @param {boolean} exclusiveMin If true will return a Number that is `exclusivePrecision` larger than `min`.
+     * @param {boolean} exclusiveMax If true will return a Number that is `exclusivePrecision` smaller than `max`.
+     * @param {number} exclusivePrecision
      * @return {number} The clamped value
      * @protected
      */
-    _clamp(value, min = 0, max = 1, exclusiveMin = false, exclusiveMax = false) {
+    _clamp(value, min = 0, max = 1, exclusiveMin = false, exclusiveMax = false, exclusivePrecision) {
         if (min === max)
             return min;
 
         if (value <= min)
-            return exclusiveMin ? min + Number.MIN_VALUE : min;
+            return exclusiveMin ? min + exclusivePrecision : min;
 
         if (value >= max)
-            return exclusiveMax ? max - Number.MIN_VALUE : max;
+            return exclusiveMax ? max - exclusivePrecision : max;
 
         return value;
     }
