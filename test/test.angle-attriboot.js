@@ -96,6 +96,19 @@ describe('attriboots', () => {
             });
         });
 
+        describe('.locked', () => {
+
+            it('should lock target', () => {
+
+                attriboot.target = 5;
+                expect(attriboot.target).to.equal(5);
+
+                attriboot.locked = true;
+                attriboot.target = 10;
+                expect(attriboot.target).to.equal(5);
+            });
+        });
+
         describe('.wrap', () => {
             _simpleSetterTests('wrap', true, 'not-bool');
 
