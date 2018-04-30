@@ -17,7 +17,7 @@ describe('attriboots', () => {
 
     // Helper for easy set-tests
     let _simpleSetterTests = (property, value, badValue) => {
-        it('can be changed and fires change events', () => {
+        it('can be changed and fires change events when the value changes', () => {
 
             var changeEventSpy = sinon.spy();
             attriboot.addEventListener('change', changeEventSpy);
@@ -40,6 +40,11 @@ describe('attriboots', () => {
                 target: attriboot,
                 value: value
             });
+
+            // set value again, no events should be fired
+            attriboot[property] = value;
+            expect(changeEventSpy).to.have.callCount(1);
+            expect(propertyChangeEventSpy).to.have.callCount(1);
         });
 
         it('only accepts correct values', () => {
@@ -68,9 +73,10 @@ describe('attriboots', () => {
             expect(defaultAttriboot.stored).to.equal(0);
 
             expect(defaultAttriboot.min).to.equal(Number.NEGATIVE_INFINITY);
-            expect(defaultAttriboot.exclusiveMin).to.equal(false);
             expect(defaultAttriboot.max).to.equal(Number.POSITIVE_INFINITY);
+            expect(defaultAttriboot.exclusiveMin).to.equal(false);
             expect(defaultAttriboot.exclusiveMax).to.equal(false);
+            expect(defaultAttriboot.exclusivePrecision).to.equal(Math.pow(10, -16));
         });
 
         it('should have correct values when instantiated', () => {
@@ -79,16 +85,18 @@ describe('attriboots', () => {
                 min: 0,
                 exclusiveMin: true,
                 max: 10,
-                exclusiveMax: true
+                exclusiveMax: true,
+                exclusivePrecision: 0.1
             });
 
             expect(defaultAttriboot.target).to.equal(5);
             expect(defaultAttriboot.raw).to.equal(5);
 
             expect(defaultAttriboot.min).to.equal(0);
-            expect(defaultAttriboot.exclusiveMin).to.equal(true);
             expect(defaultAttriboot.max).to.equal(10);
+            expect(defaultAttriboot.exclusiveMin).to.equal(true);
             expect(defaultAttriboot.exclusiveMax).to.equal(true);
+            expect(defaultAttriboot.exclusivePrecision).to.equal(0.1);
         });
 
         describe('.target', () => {
@@ -122,6 +130,10 @@ describe('attriboots', () => {
                 attriboot.target = 3;
                 expect(attriboot.lastTarget).to.equal(5);
             });
+        });
+
+        describe('.exclusivePrecision', () => {
+            _simpleSetterTests('exclusivePrecision', 0.1, 'not-number');
         });
 
         describe('.min', () => {
@@ -166,12 +178,13 @@ describe('attriboots', () => {
             it('should work', () => {
                 attriboot.min = 0;
                 attriboot.exclusiveMin = true;
+                attriboot.exclusivePrecision = 0.1;
                 attriboot.target = 0;
 
-                expect(attriboot.target).to.be.above(0);
+                expect(attriboot.target).to.equal(0.1);
 
                 attriboot.max = 0;
-                expect(attriboot.max).to.be.above(0);
+                expect(attriboot.max).to.equal(0.1);
             });
         });
 
@@ -218,12 +231,13 @@ describe('attriboots', () => {
             it('should work', () => {
                 attriboot.max = 0;
                 attriboot.exclusiveMax = true;
+                attriboot.exclusivePrecision = 0.1;
                 attriboot.target = 0;
 
-                expect(attriboot.target).to.be.below(0);
+                expect(attriboot.target).to.equal(-0.1);
 
                 attriboot.min = 0;
-                expect(attriboot.min).to.be.below(0);
+                expect(attriboot.min).to.equal(-0.1);
             });
         });
 
@@ -277,9 +291,16 @@ describe('attriboots', () => {
                 expect(attriboot.dirty).to.be.false;
             });
 
-            it('should #updateImmediate if animationTime is changed to 0 and dirty is true', () => {
+            it('should #updateImmediate if animationTime is 0 and target is changed', () => {
                 attriboot.animationTime = 0;
                 attriboot.target = 5;
+                expect(attriboot.updated).to.be.true;
+                expect(attriboot.current).to.equal(5);
+            });
+
+            it('should #updateImmediate if dirty is true and animationTime is set to 0', () => {
+                attriboot.target = 5;
+                attriboot.animationTime = 0;
                 expect(attriboot.updated).to.be.true;
                 expect(attriboot.current).to.equal(5);
             });

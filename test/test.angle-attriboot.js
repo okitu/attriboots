@@ -17,7 +17,7 @@ describe('attriboots', () => {
 
     // Helper for easy set-tests
     let _simpleSetterTests = (property, value, badValue) => {
-        it('can be changed and fires change events', () => {
+        it('can be changed and fires change events when the value changes', () => {
 
             var changeEventSpy = sinon.spy();
             attriboot.addEventListener('change', changeEventSpy);
@@ -40,6 +40,11 @@ describe('attriboots', () => {
                 target: attriboot,
                 value: value
             });
+
+            // set value again, no events should be fired
+            attriboot[property] = value;
+            expect(changeEventSpy).to.have.callCount(1);
+            expect(propertyChangeEventSpy).to.have.callCount(1);
         });
 
         it('only accepts correct values', () => {
