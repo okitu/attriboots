@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.8
+ * attriboots@0.0.9
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -599,7 +599,7 @@
                 return this._animationTime;
             },
             set: function set$$1(animationTime) {
-                if (typeof animationTime != 'number') throw new TypeError('"animationTime" must be a number');
+                if (typeof animationTime != 'number' || isNaN(animationTime)) throw new TypeError('"animationTime" must be a number');
 
                 if (animationTime == this._animationTime) return;
 
@@ -747,7 +747,7 @@
                     delta = Date.now() - this._startTime;
                 } else {
 
-                    if (typeof delta != 'number' || delta < 0) throw new TypeError('"delta" must be a positive number');
+                    if (typeof delta != 'number' || delta < 0 || isNaN(delta)) throw new TypeError('"delta" must be a positive number');
 
                     delta = Math.round(Math.abs(delta));
                 }
@@ -836,7 +836,7 @@
         }, {
             key: 'addOffset',
             value: function addOffset(offset) {
-                if (typeof offset != 'number') throw new TypeError('"offset" must be a number');
+                if (typeof offset != 'number' || isNaN(offset)) throw new TypeError('"offset" must be a number');
 
                 if (!this.locked && offset !== 0) {
 
@@ -905,7 +905,7 @@
                 return this._target;
             },
             set: function set$$1(target) {
-                if (typeof target != 'number') throw new TypeError('"target" must be a number');
+                if (typeof target != 'number' || isNaN(target)) throw new TypeError('"target" must be a number');
 
                 if (this._locked) return;
 
@@ -975,7 +975,7 @@
             set: function set$$1(min) {
                 if (min === null || min === undefined) min = Number.NEGATIVE_INFINITY;
 
-                if (typeof min != 'number') throw new TypeError('"min" must be a number');
+                if (typeof min != 'number' || isNaN(min)) throw new TypeError('"min" must be a number');
 
                 // min may not be greater than max
                 if (min >= this._max) {
@@ -1005,7 +1005,7 @@
             set: function set$$1(max) {
                 if (max === null || max === undefined) max = Number.POSITIVE_INFINITY;
 
-                if (typeof max != 'number') throw new TypeError('"max" must be a number');
+                if (typeof max != 'number' || isNaN(max)) throw new TypeError('"max" must be a number');
 
                 // may not be less than min
                 if (max <= this._min) {
@@ -1077,7 +1077,7 @@
                 return this._exclusivePrecision;
             },
             set: function set$$1(exclusivePrecision) {
-                if (typeof exclusivePrecision != 'number') throw new TypeError('"exclusivePrecision" must be a number');
+                if (typeof exclusivePrecision != 'number' || isNaN(exclusivePrecision)) throw new TypeError('"exclusivePrecision" must be a number');
 
                 if (exclusivePrecision == this._exclusivePrecision) return;
 
@@ -1210,7 +1210,7 @@
                  */
                 ,
             set: function set$$1(target) {
-                if (typeof target != 'number') throw new TypeError('"target" must be a number');
+                if (typeof target != 'number' || isNaN(target)) throw new TypeError('"target" must be a number');
 
                 if (this._locked) return;
 
