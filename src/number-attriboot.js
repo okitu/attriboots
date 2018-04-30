@@ -52,7 +52,7 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     set target(target) {
-        if (typeof(target) != 'number')
+        if (typeof(target) != 'number' || isNaN(target))
             throw new TypeError('"target" must be a number');
 
         if (this._locked)
@@ -117,7 +117,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (min === null || min === undefined)
             min = Number.NEGATIVE_INFINITY;
 
-        if (typeof(min) != 'number')
+        if (typeof(min) != 'number' || isNaN(min))
             throw new TypeError('"min" must be a number');
 
         // min may not be greater than max
@@ -148,7 +148,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (max === null || max === undefined)
             max = Number.POSITIVE_INFINITY;
 
-        if (typeof(max) != 'number')
+        if (typeof(max) != 'number' || isNaN(max))
             throw new TypeError('"max" must be a number');
 
         // may not be less than min
@@ -220,7 +220,7 @@ export default class NumberAttriboot extends BaseAttriboot {
     }
 
     set exclusivePrecision(exclusivePrecision) {
-        if (typeof(exclusivePrecision) != 'number')
+        if (typeof(exclusivePrecision) != 'number' || isNaN(exclusivePrecision))
             throw new TypeError('"exclusivePrecision" must be a number');
 
         if (exclusivePrecision == this._exclusivePrecision)
@@ -281,7 +281,7 @@ export default class NumberAttriboot extends BaseAttriboot {
             delta = Date.now() - this._startTime;
         } else {
 
-            if (typeof(delta) != 'number' || delta < 0)
+            if (typeof(delta) != 'number' || delta < 0 || isNaN(delta))
                 throw new TypeError('"delta" must be a positive number');
 
             delta = Math.round(Math.abs(delta));
@@ -362,7 +362,7 @@ export default class NumberAttriboot extends BaseAttriboot {
      * @param {number} offset
      */
     addOffset(offset) {
-        if (typeof(offset) != 'number')
+        if (typeof(offset) != 'number' || isNaN(offset))
             throw new TypeError('"offset" must be a number');
 
         if (!this.locked && offset !== 0) {

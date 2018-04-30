@@ -23,7 +23,7 @@ describe('attriboots', () => {
     let attriboot;
 
     // Helper for easy set-tests
-    let _simpleSetterTests = (property, value, badValue) => {
+    let _simpleSetterTests = (property, value, badValue, anotherBadValue) => {
         it('can be changed and fires change events when the value changes', () => {
 
             var changeEventSpy = sinon.spy();
@@ -58,6 +58,12 @@ describe('attriboots', () => {
             expect(() => {
                 attriboot[property] = badValue;
             }).to.throw(Error);
+
+            if (anotherBadValue !== undefined) {
+                expect(() => {
+                    attriboot[property] = anotherBadValue;
+                }).to.throw(Error);
+            }
         });
     };
 
@@ -108,7 +114,7 @@ describe('attriboots', () => {
         });
 
         describe('.animationTime', () => {
-            _simpleSetterTests('animationTime', 123, 'not-number');
+            _simpleSetterTests('animationTime', 123, 'not-number', NaN);
         });
 
         describe('.easing', () => {

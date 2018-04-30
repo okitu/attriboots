@@ -135,7 +135,7 @@ export default class BaseAttriboot {
     }
 
     set animationTime(animationTime) {
-        if (typeof(animationTime) != 'number')
+        if (typeof(animationTime) != 'number' || isNaN(animationTime))
             throw new TypeError('"animationTime" must be a number');
 
         if (animationTime == this._animationTime)

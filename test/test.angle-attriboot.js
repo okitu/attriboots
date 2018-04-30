@@ -80,7 +80,7 @@ describe('attriboots', () => {
         });
 
         describe('.target', () => {
-            _simpleSetterTests('target', 1, 'not-number');
+            _simpleSetterTests('target', 1, 'not-number', NaN);
 
             it('should work', () => {
 

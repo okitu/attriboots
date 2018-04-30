@@ -100,7 +100,7 @@ describe('attriboots', () => {
         });
 
         describe('.target', () => {
-            _simpleSetterTests('target', 5, 'not-number');
+            _simpleSetterTests('target', 5, 'not-number', NaN);
 
             it('should #updateImmediate if animationTime is 0', () => {
                 attriboot.animationTime = 0;
@@ -133,11 +133,11 @@ describe('attriboots', () => {
         });
 
         describe('.exclusivePrecision', () => {
-            _simpleSetterTests('exclusivePrecision', 0.1, 'not-number');
+            _simpleSetterTests('exclusivePrecision', 0.1, 'not-number', NaN);
         });
 
         describe('.min', () => {
-            _simpleSetterTests('min', -3, 'not-number');
+            _simpleSetterTests('min', -3, 'not-number', NaN);
 
             it('should be set to Number.NEGATIVE_INFINITY if assign null or undefined', () => {
 
@@ -189,7 +189,7 @@ describe('attriboots', () => {
         });
 
         describe('.max', () => {
-            _simpleSetterTests('max', 3, 'not-number');
+            _simpleSetterTests('max', 3, 'not-number', NaN);
 
             it('should be set to Number.POSITIVE_INFINITY if assign null or undefined', () => {
 
@@ -341,7 +341,7 @@ describe('attriboots', () => {
                 attriboot.addEventListener('update', updateSpy);
 
                 expect(() => {
-                    attriboot.update('not-number');
+                    attriboot.update('not-number', NaN);
                 }).to.throw(Error);
 
                 attriboot.animationTime = 200;
@@ -415,7 +415,7 @@ describe('attriboots', () => {
 
             it('only accepts correct values', () => {
                 expect(() => {
-                    attriboot.addOffset('not-number');
+                    attriboot.addOffset('not-number', NaN);
                 }).to.throw(Error);
             });
 

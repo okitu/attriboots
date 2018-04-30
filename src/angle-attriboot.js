@@ -37,7 +37,7 @@ export default class AngleAttriboot extends NumberAttriboot {
      * @override
      */
     set target(target) {
-        if (typeof(target) != 'number')
+        if (typeof(target) != 'number' || isNaN(target))
             throw new TypeError('"target" must be a number');
 
         if (this._locked)
