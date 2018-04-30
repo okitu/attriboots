@@ -46,7 +46,7 @@ export default class AngleAttriboot extends NumberAttriboot {
         this._raw = target;
 
         if (!this._ignoreBounds)
-            target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax);
+            target = this._clamp(target);
 
         if (target == this._target)
             return;

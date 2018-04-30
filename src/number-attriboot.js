@@ -61,7 +61,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         this._raw = target;
 
         if (!this._ignoreBounds)
-            target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax, this._exclusivePrecision);
+            target = this._clamp(target);
 
         if (target == this._target)
             return;
@@ -244,24 +244,20 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * Ensures that `value` is between `min` and `max`.
-     * @param {number} value
-     * @param {number} min
-     * @param {number} max
-     * @param {boolean} exclusiveMin If true will return a Number that is `exclusivePrecision` larger than `min`.
-     * @param {boolean} exclusiveMax If true will return a Number that is `exclusivePrecision` smaller than `max`.
-     * @param {number} exclusivePrecision
+     * If `exclusiveMin` true will return a Number that is `exclusivePrecision` larger than `min`.
+     * If `exclusiveMax` true will return a Number that is `exclusivePrecision` smaller than `max`.
      * @return {number} The clamped value
      * @protected
      */
-    _clamp(value, min = 0, max = 1, exclusiveMin = false, exclusiveMax = false, exclusivePrecision) {
-        if (min === max)
-            return min;
+    _clamp(value) {
+        if (this.min === this.max)
+            return this.min;
 
-        if (value <= min)
-            return exclusiveMin ? min + exclusivePrecision : min;
+        if (value <= this.min)
+            return this.exclusiveMin ? this.min + this.exclusivePrecision : this.min;
 
-        if (value >= max)
-            return exclusiveMax ? max - exclusivePrecision : max;
+        if (value >= this.max)
+            return this.exclusiveMax ? this.max - this.exclusivePrecision : this.max;
 
         return value;
     }
