@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.6
+ * attriboots@0.0.8
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -661,12 +661,14 @@
                 target = _ref$target === undefined ? 0 : _ref$target,
                 _ref$min = _ref.min,
                 min = _ref$min === undefined ? Number.NEGATIVE_INFINITY : _ref$min,
-                _ref$exclusiveMin = _ref.exclusiveMin,
-                exclusiveMin = _ref$exclusiveMin === undefined ? false : _ref$exclusiveMin,
                 _ref$max = _ref.max,
                 max = _ref$max === undefined ? Number.POSITIVE_INFINITY : _ref$max,
+                _ref$exclusiveMin = _ref.exclusiveMin,
+                exclusiveMin = _ref$exclusiveMin === undefined ? false : _ref$exclusiveMin,
                 _ref$exclusiveMax = _ref.exclusiveMax,
-                exclusiveMax = _ref$exclusiveMax === undefined ? false : _ref$exclusiveMax;
+                exclusiveMax = _ref$exclusiveMax === undefined ? false : _ref$exclusiveMax,
+                _ref$exclusivePrecisi = _ref.exclusivePrecision,
+                exclusivePrecision = _ref$exclusivePrecisi === undefined ? Math.pow(10, -16) : _ref$exclusivePrecisi;
 
             classCallCheck(this, NumberAttriboot);
 
@@ -680,9 +682,10 @@
             _this._stored = 0;
 
             _this.min = min;
-            _this.exclusiveMin = exclusiveMin;
             _this.max = max;
+            _this.exclusiveMin = exclusiveMin;
             _this.exclusiveMax = exclusiveMax;
+            _this.exclusivePrecision = exclusivePrecision;
 
             _this.apply(target);
             return _this;
@@ -704,8 +707,9 @@
              * @param {number} value
              * @param {number} min
              * @param {number} max
-             * @param {boolean} exclusiveMin If true will return a Number the is `Number.MIN_VALUE` larger than `min`.
-             * @param {boolean} exclusiveMax If true will return a Number the is `Number.MIN_VALUE` smaller than `max`.
+             * @param {boolean} exclusiveMin If true will return a Number that is `exclusivePrecision` larger than `min`.
+             * @param {boolean} exclusiveMax If true will return a Number that is `exclusivePrecision` smaller than `max`.
+             * @param {number} exclusivePrecision
              * @return {number} The clamped value
              * @protected
              */
@@ -714,12 +718,13 @@
                 var max = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
                 var exclusiveMin = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
                 var exclusiveMax = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+                var exclusivePrecision = arguments[5];
 
                 if (min === max) return min;
 
-                if (value <= min) return exclusiveMin ? min + Number.MIN_VALUE : min;
+                if (value <= min) return exclusiveMin ? min + exclusivePrecision : min;
 
-                if (value >= max) return exclusiveMax ? max - Number.MIN_VALUE : max;
+                if (value >= max) return exclusiveMax ? max - exclusivePrecision : max;
 
                 return value;
             }
@@ -906,7 +911,7 @@
 
                 this._raw = target;
 
-                if (!this._ignoreBounds) target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax);
+                if (!this._ignoreBounds) target = this._clamp(target, this._min, this._max, this._exclusiveMin, this._exclusiveMax, this._exclusivePrecision);
 
                 if (target == this._target) return;
 
@@ -975,7 +980,7 @@
                 // min may not be greater than max
                 if (min >= this._max) {
                     // respect exclusiveMax
-                    min = this.exclusiveMax ? this.max - Number.MIN_VALUE : this.max;
+                    min = this.exclusiveMax ? this.max - this.exclusivePrecision : this.max;
                 }
 
                 if (min == this._min) return;
@@ -1005,7 +1010,7 @@
                 // may not be less than min
                 if (max <= this._min) {
                     // respect exclusiveMin
-                    max = this.exclusiveMin ? this.min + Number.MIN_VALUE : this.min;
+                    max = this.exclusiveMin ? this.min + this.exclusivePrecision : this.min;
                 }
 
                 if (max == this._max) return;
@@ -1018,7 +1023,7 @@
 
             /**
              * If true, `min` will be an exclusive minimum, meaning `target` and `currebnt`
-             * will always be larger by `Number.MIN_VALUE` and never equal to max.
+             * will always be larger by `exclusivePrecision` and never equal to max.
              * @type {boolean}
              */
 
@@ -1030,6 +1035,8 @@
             set: function set$$1(exclusiveMin) {
                 if (typeof exclusiveMin != 'boolean') throw new TypeError('"exclusiveMin" must be a boolean');
 
+                if (exclusiveMin == this._exclusiveMin) return;
+
                 this._exclusiveMin = exclusiveMin;
                 this._triggerChange('exclusiveMin', this._exclusiveMin);
                 this.target = this._raw;
@@ -1037,7 +1044,7 @@
 
             /**
              * If true, max will be an exclusive maximum, meaning `target` and `current`
-             * will always be smaller by `Number.MIN_VALUE` and never equal to `max`.
+             * will always be smaller by `exclusivePrecision` and never equal to `max`.
              * @type {boolean}
              */
 
@@ -1054,6 +1061,28 @@
                 this._exclusiveMax = exclusiveMax;
                 this._triggerChange('exclusiveMax', this._exclusiveMax);
                 this.target = this._raw;
+            }
+
+            /**
+             * If `exclusiveMin` or `exclusiveMax` is true, and a value has to be clamped,
+             * the result will always be `exclusivePrecision` larger than `min` and
+             * `exclusivePrecision` smaller than `max`.
+             * Defaults to 10^-16.
+             * @type {number}
+             */
+
+        }, {
+            key: 'exclusivePrecision',
+            get: function get$$1() {
+                return this._exclusivePrecision;
+            },
+            set: function set$$1(exclusivePrecision) {
+                if (typeof exclusivePrecision != 'number') throw new TypeError('"exclusivePrecision" must be a number');
+
+                if (exclusivePrecision == this._exclusivePrecision) return;
+
+                this._exclusivePrecision = exclusivePrecision;
+                this._triggerChange('exclusivePrecision', this._exclusivePrecision);
             }
 
             /**
