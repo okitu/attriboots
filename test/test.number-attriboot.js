@@ -66,7 +66,7 @@ describe('attriboots', () => {
             let defaultAttriboot = new NumberAttriboot();
 
             expect(defaultAttriboot.target).to.equal(0);
-            expect(defaultAttriboot.lastTarget).to.equal(null);
+            expect(defaultAttriboot.lastTarget).to.equal(0);
             expect(defaultAttriboot.current).to.equal(0);
             expect(defaultAttriboot.previous).to.equal(0);
             expect(defaultAttriboot.raw).to.equal(0);
@@ -81,7 +81,7 @@ describe('attriboots', () => {
 
         it('should have correct values when instantiated', () => {
             let defaultAttriboot = new NumberAttriboot({
-                target: 5,
+                value: 5,
                 min: 0,
                 exclusiveMin: true,
                 max: 10,

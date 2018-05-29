@@ -7,7 +7,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     constructor({
 
-            target: target = 0,
+            value: value = 0,
             min: min = Number.NEGATIVE_INFINITY,
             max: max = Number.POSITIVE_INFINITY,
             exclusiveMin: exclusiveMin = false,
@@ -20,11 +20,11 @@ export default class NumberAttriboot extends BaseAttriboot {
 
         super(...arguments);
 
-        this._target = null;
-        this._lastTarget = 0;
-        this._current = 0;
-        this._previous = 0;
-        this._raw = 0;
+        this._target = value;
+        this._lastTarget = value;
+        this._current = value;
+        this._previous = value;
+        this._raw = value;
         this._stored = 0;
 
         this.min = min;
@@ -32,8 +32,6 @@ export default class NumberAttriboot extends BaseAttriboot {
         this.exclusiveMin = exclusiveMin;
         this.exclusiveMax = exclusiveMax;
         this.exclusivePrecision = exclusivePrecision;
-
-        this.apply(target);
     }
 
     /**
