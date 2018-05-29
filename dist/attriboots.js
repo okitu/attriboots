@@ -657,8 +657,8 @@
 
         function NumberAttriboot() {
             var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-                _ref$target = _ref.target,
-                target = _ref$target === undefined ? 0 : _ref$target,
+                _ref$value = _ref.value,
+                value = _ref$value === undefined ? 0 : _ref$value,
                 _ref$min = _ref.min,
                 min = _ref$min === undefined ? Number.NEGATIVE_INFINITY : _ref$min,
                 _ref$max = _ref.max,
@@ -674,11 +674,11 @@
 
             var _this = possibleConstructorReturn(this, (NumberAttriboot.__proto__ || Object.getPrototypeOf(NumberAttriboot)).apply(this, arguments));
 
-            _this._target = null;
-            _this._lastTarget = 0;
-            _this._current = 0;
-            _this._previous = 0;
-            _this._raw = 0;
+            _this._target = value;
+            _this._lastTarget = value;
+            _this._current = value;
+            _this._previous = value;
+            _this._raw = value;
             _this._stored = 0;
 
             _this.min = min;
@@ -686,8 +686,6 @@
             _this.exclusiveMin = exclusiveMin;
             _this.exclusiveMax = exclusiveMax;
             _this.exclusivePrecision = exclusivePrecision;
-
-            _this.apply(target);
             return _this;
         }
 
@@ -1139,6 +1137,41 @@
             }
 
             //
+            // Public methods
+            // --------------------------------------------------
+
+            /**
+             * Adds `offset` to `target` and `current`.
+             * @param {number} offset
+             * @override
+             */
+
+        }, {
+            key: 'addOffset',
+            value: function addOffset(offset) {
+                if (typeof offset != 'number' || isNaN(offset)) throw new TypeError('"offset" must be a number');
+
+                if (!this.locked && offset !== 0) {
+
+                    this.target += offset;
+
+                    // Target may have been clamped
+                    var actualOffset = this._target - this._lastTarget;
+
+                    if (actualOffset !== 0) {
+                        this._start += actualOffset;
+                        if (this._wrap && this._shortRotation) this._applyShortRotation();
+
+                        this._current += actualOffset;
+                        if (this._wrap) this._current = this._wrapTo360Degrees(this._current);
+
+                        this._updated = true;
+                        this._triggerUpdate();
+                    }
+                }
+            }
+
+            //
             // Private methods
             // --------------------------------------------------
 
@@ -1169,8 +1202,8 @@
              */
 
         }, {
-            key: '_wrapTo360',
-            value: function _wrapTo360(angle) {
+            key: '_wrapTo360Degrees',
+            value: function _wrapTo360Degrees(angle) {
                 if (angle > 360) return angle % 360;
 
                 while (angle < 0) {
@@ -1182,7 +1215,7 @@
         }, {
             key: 'current',
             get: function get$$1() {
-                return this._wrap ? this._wrapTo360(this._current) : this._current;
+                return this._wrap ? this._wrapTo360Degrees(this._current) : this._current;
             }
 
             /**
@@ -1192,7 +1225,7 @@
         }, {
             key: 'target',
             get: function get$$1() {
-                    return this._wrap ? this._wrapTo360(this._target) : this._target;
+                    return this._wrap ? this._wrapTo360Degrees(this._target) : this._target;
                 }
 
                 /**
