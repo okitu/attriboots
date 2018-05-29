@@ -88,7 +88,7 @@ describe('attriboots', () => {
                 attriboot.target = 10;
                 expect(attriboot.target).to.equal(10);
                 expect(attriboot.current).to.equal(10);
-                
+
                 attriboot.locked = true;
                 attriboot.target = 20;
                 expect(attriboot.target).to.equal(10);
@@ -155,6 +155,48 @@ describe('attriboots', () => {
                 attriboot.updateImmediate();
                 expect(attriboot.getCurrentRadians()).to.equal(Math.PI);
 
+            });
+        });
+
+        describe('#addOffset', () => {
+
+            it('only accepts correct values', () => {
+                expect(() => {
+                    attriboot.addOffset('not-number', NaN);
+                }).to.throw(Error);
+            });
+
+            it('should work', () => {
+
+                attriboot.target = 5;
+                expect(attriboot.current).to.equal(0);
+                expect(attriboot.target).to.equal(5);
+
+                attriboot.addOffset(2);
+                expect(attriboot.current).to.equal(2);
+                expect(attriboot.target).to.equal(7);
+            });
+
+            it('should work with .wrap & .shortRotation', () => {
+
+                attriboot.wrap = true;
+                attriboot.shortRotation = true;
+
+                expect(attriboot.current).to.equal(0);
+                expect(attriboot.target).to.equal(0);
+
+                attriboot.target = 350;
+                attriboot.addOffset(-5);
+                expect(attriboot.current).to.equal(355);
+                expect(attriboot.target).to.equal(345);
+                
+                attriboot.target = 0;
+                attriboot.updateImmediate();
+
+                attriboot.target = 350;
+                attriboot.addOffset(-730);
+                expect(attriboot.current).to.equal(350);
+                expect(attriboot.target).to.equal(340);
             });
         });
 

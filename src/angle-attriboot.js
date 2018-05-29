@@ -23,14 +23,14 @@ export default class AngleAttriboot extends NumberAttriboot {
      * @override
      */
     get current() {
-        return this._wrap ? this._wrapTo360(this._current) : this._current;
+        return this._wrap ? this._wrapTo360Degrees(this._current) : this._current;
     }
 
     /**
      * @override
      */
     get target() {
-        return this._wrap ? this._wrapTo360(this._target) : this._target;
+        return this._wrap ? this._wrapTo360Degrees(this._target) : this._target;
     }
 
     /**
@@ -125,6 +125,41 @@ export default class AngleAttriboot extends NumberAttriboot {
     }
 
     //
+    // Public methods
+    // --------------------------------------------------
+
+    /**
+     * Adds `offset` to `target` and `current`.
+     * @param {number} offset
+     * @override
+     */
+    addOffset(offset) {
+        if (typeof(offset) != 'number' || isNaN(offset))
+            throw new TypeError('"offset" must be a number');
+
+        if (!this.locked && offset !== 0) {
+            
+            this.target += offset;
+
+            // Target may have been clamped
+            var actualOffset = this._target - this._lastTarget;
+
+            if (actualOffset !== 0) {
+                this._start += actualOffset;
+                if (this._wrap && this._shortRotation)
+                    this._applyShortRotation();
+
+                this._current += actualOffset;
+                if (this._wrap)
+                    this._current = this._wrapTo360Degrees(this._current);
+
+                this._updated = true;
+                this._triggerUpdate();
+            }
+        }
+    }
+
+    //
     // Private methods
     // --------------------------------------------------
 
@@ -149,7 +184,7 @@ export default class AngleAttriboot extends NumberAttriboot {
      * @return {number}
      * @private
      */
-    _wrapTo360(angle) {
+    _wrapTo360Degrees(angle) {
         if (angle > 360)
             return angle % 360;
 
