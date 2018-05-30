@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.10
+ * attriboots@0.0.12
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -1156,7 +1156,7 @@
                     this.target += offset;
 
                     // Target may have been clamped
-                    var actualOffset = this._target - this._lastTarget;
+                    var actualOffset = this.target - this._lastTarget;
 
                     if (actualOffset !== 0) {
                         this._start += actualOffset;
@@ -1243,7 +1243,7 @@
 
                 if (target == this._target) return;
 
-                this._lastTarget = this._target;
+                this._lastTarget = this.target;
 
                 this._start = this.current;
                 this._startTime = this._currentTime = Date.now();
