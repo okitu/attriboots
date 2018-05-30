@@ -51,7 +51,7 @@ export default class AngleAttriboot extends NumberAttriboot {
         if (target == this._target)
             return;
 
-        this._lastTarget = this._target;
+        this._lastTarget = this.target;
 
         this._start = this.current;
         this._startTime = this._currentTime = Date.now();
@@ -138,11 +138,11 @@ export default class AngleAttriboot extends NumberAttriboot {
             throw new TypeError('"offset" must be a number');
 
         if (!this.locked && offset !== 0) {
-            
+
             this.target += offset;
 
             // Target may have been clamped
-            var actualOffset = this._target - this._lastTarget;
+            var actualOffset = this.target - this._lastTarget;
 
             if (actualOffset !== 0) {
                 this._start += actualOffset;
