@@ -13,15 +13,18 @@ banner += fs.readFileSync(__dirname + '/LICENSE', 'utf-8');
 banner = banner + '\n@license\n';
 
 export default {
-    entry: 'src/index.js',
-    format: 'umd',
-    moduleName: 'attriboots',
+    input: 'src/index.js',
+    output: {
+        file: 'dist/attriboots.js',
+        format: 'umd',
+        name: 'attriboots',
+        sourceMap: true
+    },
     plugins: [
         license({
             sourceMap: true,
             banner: banner
         }),
         babel()
-    ],
-    dest: 'dist/attriboots.js' // equivalent to --output
+    ]
 };
