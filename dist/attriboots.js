@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.12
+ * attriboots@0.0.13
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -31,7 +31,7 @@
 (function(global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
         typeof define === 'function' && define.amd ? define(['exports'], factory) :
-        (factory((global.attriboots = global.attriboots || {})));
+        (factory((global.attriboots = {})));
 }(this, (function(exports) {
     'use strict';
 
@@ -818,6 +818,7 @@
 
             /**
              * Adds `offset` to `target` and `current`.
+             * Will not reset animation times.
              * @param {number} offset
              */
 
@@ -828,7 +829,11 @@
 
                 if (!this.locked && offset !== 0) {
 
+                    // Prevent animation start & times from changing
+                    this._isAddingOffset = true;
+
                     this.target += offset;
+                    this._isAddingOffset = false;
 
                     // Target may have been clamped
                     var actualOffset = this._target - this._lastTarget;
@@ -905,11 +910,13 @@
 
                 this._lastTarget = this._target;
 
-                this._start = this.current;
-                this._startTime = this._currentTime = Date.now();
+                if (!this._isAddingOffset) {
+                    this._start = this.current;
+                    this._startTime = this._currentTime = Date.now();
+                    this._targetTime = this._startTime + this._animationTime;
+                }
 
                 this._target = target;
-                this._targetTime = Date.now() + this._animationTime;
 
                 this._triggerChange('target', this._target);
 
@@ -1142,6 +1149,7 @@
 
             /**
              * Adds `offset` to `target` and `current`.
+             * Will not reset animation times.
              * @param {number} offset
              * @override
              */
@@ -1153,7 +1161,11 @@
 
                 if (!this.locked && offset !== 0) {
 
+                    // Prevent animation start & times from changing
+                    this._isAddingOffset = true;
+
                     this.target += offset;
+                    this._isAddingOffset = false;
 
                     // Target may have been clamped
                     var actualOffset = this.target - this._lastTarget;
@@ -1185,10 +1197,13 @@
         }, {
             key: '_applyShortRotation',
             value: function _applyShortRotation() {
+                this._start = this._wrapTo360Degrees(this._start);
+
                 // fix for short rotation
                 while (this._start - this._target > 180) {
                     this._start -= 360;
                 }
+
                 while (this._start - this._target < -180) {
                     this._start += 360;
                 }
@@ -1241,17 +1256,21 @@
 
                 if (!this._ignoreBounds) target = this._clamp(target);
 
+                if (this._wrap) target = this._wrapTo360Degrees(target);
+
                 if (target == this._target) return;
 
                 this._lastTarget = this.target;
 
-                this._start = this.current;
-                this._startTime = this._currentTime = Date.now();
+                if (!this._isAddingOffset) {
+                    this._start = this.current;
+                    this._startTime = this._currentTime = Date.now();
+                    this._targetTime = this._startTime + this._animationTime;
+                }
 
                 this._target = target;
-                this._targetTime = Date.now() + this._animationTime;
 
-                if (this._wrap && this._shortRotation) this._applyShortRotation();
+                if (this._wrap && this._shortRotation && !this._isAddingOffset) this._applyShortRotation();
 
                 this._triggerChange('target', this._target);
 
