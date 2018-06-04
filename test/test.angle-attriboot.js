@@ -169,10 +169,12 @@ describe('attriboots', () => {
             it('should work', () => {
 
                 attriboot.target = 5;
+                expect(attriboot._start).to.equal(0);
                 expect(attriboot.current).to.equal(0);
                 expect(attriboot.target).to.equal(5);
 
                 attriboot.addOffset(2);
+                expect(attriboot._start).to.equal(2);
                 expect(attriboot.current).to.equal(2);
                 expect(attriboot.target).to.equal(7);
             });
@@ -187,14 +189,16 @@ describe('attriboots', () => {
 
                 attriboot.target = 350;
                 attriboot.addOffset(-5);
+                expect(attriboot._start).to.equal(355);
                 expect(attriboot.current).to.equal(355);
                 expect(attriboot.target).to.equal(345);
-                
+
                 attriboot.target = 0;
                 attriboot.updateImmediate();
 
                 attriboot.target = 350;
                 attriboot.addOffset(-730);
+                expect(attriboot._start).to.equal(350);
                 expect(attriboot.current).to.equal(350);
                 expect(attriboot.target).to.equal(340);
             });

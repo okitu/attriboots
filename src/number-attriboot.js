@@ -7,16 +7,14 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     constructor({
 
-            value: value = 0,
-            min: min = Number.NEGATIVE_INFINITY,
-            max: max = Number.POSITIVE_INFINITY,
-            exclusiveMin: exclusiveMin = false,
-            exclusiveMax: exclusiveMax = false,
-            exclusivePrecision: exclusivePrecision = Math.pow(10, -16)
+        value: value = 0,
+        min: min = Number.NEGATIVE_INFINITY,
+        max: max = Number.POSITIVE_INFINITY,
+        exclusiveMin: exclusiveMin = false,
+        exclusiveMax: exclusiveMax = false,
+        exclusivePrecision: exclusivePrecision = Math.pow(10, -16)
 
-        } = {}
-
-    ) {
+    } = {}) {
 
         super(...arguments);
 
@@ -66,11 +64,13 @@ export default class NumberAttriboot extends BaseAttriboot {
 
         this._lastTarget = this._target;
 
-        this._start = this.current;
-        this._startTime = this._currentTime = Date.now();
+        if (!this._isAddingOffset) {
+            this._start = this.current;
+            this._startTime = this._currentTime = Date.now();
+            this._targetTime = this._startTime + this._animationTime;
+        }
 
         this._target = target;
-        this._targetTime = Date.now() + this._animationTime;
 
         this._triggerChange('target', this._target);
 
@@ -353,6 +353,7 @@ export default class NumberAttriboot extends BaseAttriboot {
 
     /**
      * Adds `offset` to `target` and `current`.
+     * Will not reset animation times.
      * @param {number} offset
      */
     addOffset(offset) {
@@ -361,7 +362,11 @@ export default class NumberAttriboot extends BaseAttriboot {
 
         if (!this.locked && offset !== 0) {
 
+            // Prevent animation start & times from changing
+            this._isAddingOffset = true;
+
             this.target += offset;
+            this._isAddingOffset = false;
 
             // Target may have been clamped
             var actualOffset = this._target - this._lastTarget;

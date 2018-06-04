@@ -7,12 +7,11 @@ export default class AngleAttriboot extends NumberAttriboot {
 
     constructor({
 
-            shortRotation: shortRotation = false,
-            wrap: wrap = false
+        shortRotation: shortRotation = false,
+        wrap: wrap = false
 
-        } = {}
-
-    ) {
+    } = {}) {
+        
         super(...arguments);
 
         this._shortRotation = shortRotation;
@@ -48,18 +47,23 @@ export default class AngleAttriboot extends NumberAttriboot {
         if (!this._ignoreBounds)
             target = this._clamp(target);
 
+        if (this._wrap)
+            target = this._wrapTo360Degrees(target);
+
         if (target == this._target)
             return;
 
         this._lastTarget = this.target;
 
-        this._start = this.current;
-        this._startTime = this._currentTime = Date.now();
+        if (!this._isAddingOffset) {
+            this._start = this.current;
+            this._startTime = this._currentTime = Date.now();
+            this._targetTime = this._startTime + this._animationTime;
+        }
 
         this._target = target;
-        this._targetTime = Date.now() + this._animationTime;
 
-        if (this._wrap && this._shortRotation)
+        if (this._wrap && this._shortRotation && !this._isAddingOffset)
             this._applyShortRotation();
 
         this._triggerChange('target', this._target);
@@ -130,6 +134,7 @@ export default class AngleAttriboot extends NumberAttriboot {
 
     /**
      * Adds `offset` to `target` and `current`.
+     * Will not reset animation times.
      * @param {number} offset
      * @override
      */
@@ -139,7 +144,11 @@ export default class AngleAttriboot extends NumberAttriboot {
 
         if (!this.locked && offset !== 0) {
 
+            // Prevent animation start & times from changing
+            this._isAddingOffset = true;
+
             this.target += offset;
+            this._isAddingOffset = false;
 
             // Target may have been clamped
             var actualOffset = this.target - this._lastTarget;
@@ -170,12 +179,16 @@ export default class AngleAttriboot extends NumberAttriboot {
      * @private
      */
     _applyShortRotation() {
-        // fix for short rotation
-        while (this._start - this._target > 180)
-            this._start -= 360;
+        this._start = this._wrapTo360Degrees(this._start);
 
-        while (this._start - this._target < -180)
+        // fix for short rotation
+        while (this._start - this._target > 180) {
+            this._start -= 360;
+        }
+
+        while (this._start - this._target < -180) {
             this._start += 360;
+        }
     }
 
     /**
