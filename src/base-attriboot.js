@@ -206,6 +206,11 @@ export default class BaseAttriboot {
         return false;
     }
 
+    /**
+     * Sets `previous` & `previousTarget` to `current` & `target` respectively.
+     */
+    clearPrevious() {}
+
     //
     // EventTarget Interface
     // https://developer.mozilla.org/en-US/docs/Web/API/Event

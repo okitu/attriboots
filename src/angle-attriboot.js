@@ -53,7 +53,7 @@ export default class AngleAttriboot extends NumberAttriboot {
         if (target == this._target)
             return;
 
-        this._lastTarget = this.target;
+        this._previousTarget = this.target;
 
         if (!this._isAddingOffset) {
             this._start = this.current;
@@ -151,7 +151,7 @@ export default class AngleAttriboot extends NumberAttriboot {
             this._isAddingOffset = false;
 
             // Target may have been clamped
-            var actualOffset = this.target - this._lastTarget;
+            var actualOffset = this.target - this._previousTarget;
 
             if (actualOffset !== 0) {
                 this._start += actualOffset;

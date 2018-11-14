@@ -19,7 +19,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         super(...arguments);
 
         this._target = value;
-        this._lastTarget = value;
+        this._previousTarget = value;
         this._current = value;
         this._previous = value;
         this._raw = value;
@@ -62,7 +62,7 @@ export default class NumberAttriboot extends BaseAttriboot {
         if (target == this._target)
             return;
 
-        this._lastTarget = this._target;
+        this._previousTarget = this._target;
 
         if (!this._isAddingOffset) {
             this._start = this.current;
@@ -82,8 +82,8 @@ export default class NumberAttriboot extends BaseAttriboot {
      * The last target value.
      * @type {number}
      */
-    get lastTarget() {
-        return this._lastTarget;
+    get previousTarget() {
+        return this._previousTarget;
     }
 
     /**
@@ -328,8 +328,6 @@ export default class NumberAttriboot extends BaseAttriboot {
         var targetChanged;
 
         if (this.dirty) {
-
-            this._lastTarget = this._target;
             this._target = this._current;
             targetChanged = true;
 
@@ -340,6 +338,14 @@ export default class NumberAttriboot extends BaseAttriboot {
         targetChanged && this._triggerChange();
 
         return targetChanged;
+    }
+
+    /**
+     * Sets `previous` & `previousTarget` to `current` & `target` respectively.
+     */
+    clearPrevious() {
+        this._previousTarget = this._target;
+        this._previous = this._current;
     }
 
     /**
@@ -369,7 +375,7 @@ export default class NumberAttriboot extends BaseAttriboot {
             this._isAddingOffset = false;
 
             // Target may have been clamped
-            var actualOffset = this._target - this._lastTarget;
+            var actualOffset = this._target - this._previousTarget;
 
             if (actualOffset !== 0) {
                 this._start += actualOffset;

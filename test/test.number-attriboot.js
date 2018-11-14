@@ -66,7 +66,7 @@ describe('attriboots', () => {
             let defaultAttriboot = new NumberAttriboot();
 
             expect(defaultAttriboot.target).to.equal(0);
-            expect(defaultAttriboot.lastTarget).to.equal(0);
+            expect(defaultAttriboot.previousTarget).to.equal(0);
             expect(defaultAttriboot.current).to.equal(0);
             expect(defaultAttriboot.previous).to.equal(0);
             expect(defaultAttriboot.raw).to.equal(0);
@@ -124,11 +124,11 @@ describe('attriboots', () => {
             });
         });
 
-        describe('.lastTarget', () => {
+        describe('.previousTarget', () => {
             it('should return the last value of target', () => {
                 attriboot.target = 5;
                 attriboot.target = 3;
-                expect(attriboot.lastTarget).to.equal(5);
+                expect(attriboot.previousTarget).to.equal(5);
             });
         });
 
@@ -398,6 +398,24 @@ describe('attriboots', () => {
                 expect(attriboot.dirty).to.be.false;
                 expect(attriboot.update()).to.be.false;
                 expect(attriboot.stop()).to.be.false;
+            });
+        });
+
+        describe('#clearPrevious', () => {
+
+            it('should work', () => {
+                attriboot.target = 10;
+
+                expect(attriboot.current).to.equal(0);
+                expect(attriboot.stop()).to.be.true;
+                expect(attriboot.target).to.equal(attriboot.current);
+                expect(attriboot.previousTarget).to.equal(0);
+                expect(attriboot.previous).to.equal(0);
+
+                attriboot.clearPrevious();
+
+                expect(attriboot.previous).to.be.equal(attriboot.current);
+                expect(attriboot.previousTarget).to.equal(attriboot.target);
             });
         });
 
