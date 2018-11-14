@@ -1,5 +1,5 @@
 /**
- * attriboots@0.0.13
+ * attriboots@0.0.15
  * https://github.com/okitu/attriboots
  *
  * @license
@@ -392,6 +392,14 @@
                 return false;
             }
 
+            /**
+             * Sets `previous` & `previousTarget` to `current` & `target` respectively.
+             */
+
+        }, {
+            key: 'clearPrevious',
+            value: function clearPrevious() {}
+
             //
             // EventTarget Interface
             // https://developer.mozilla.org/en-US/docs/Web/API/Event
@@ -675,7 +683,7 @@
             var _this = possibleConstructorReturn(this, (NumberAttriboot.__proto__ || Object.getPrototypeOf(NumberAttriboot)).apply(this, arguments));
 
             _this._target = value;
-            _this._lastTarget = value;
+            _this._previousTarget = value;
             _this._current = value;
             _this._previous = value;
             _this._raw = value;
@@ -791,8 +799,6 @@
                 var targetChanged;
 
                 if (this.dirty) {
-
-                    this._lastTarget = this._target;
                     this._target = this._current;
                     targetChanged = true;
                 } else {
@@ -802,6 +808,17 @@
                 targetChanged && this._triggerChange();
 
                 return targetChanged;
+            }
+
+            /**
+             * Sets `previous` & `previousTarget` to `current` & `target` respectively.
+             */
+
+        }, {
+            key: 'clearPrevious',
+            value: function clearPrevious() {
+                this._previousTarget = this._target;
+                this._previous = this._current;
             }
 
             /**
@@ -836,7 +853,7 @@
                     this._isAddingOffset = false;
 
                     // Target may have been clamped
-                    var actualOffset = this._target - this._lastTarget;
+                    var actualOffset = this._target - this._previousTarget;
 
                     if (actualOffset !== 0) {
                         this._start += actualOffset;
@@ -908,7 +925,7 @@
 
                 if (target == this._target) return;
 
-                this._lastTarget = this._target;
+                this._previousTarget = this._target;
 
                 if (!this._isAddingOffset) {
                     this._start = this.current;
@@ -929,9 +946,9 @@
              */
 
         }, {
-            key: 'lastTarget',
+            key: 'previousTarget',
             get: function get$$1() {
-                return this._lastTarget;
+                return this._previousTarget;
             }
 
             /**
@@ -1168,7 +1185,7 @@
                     this._isAddingOffset = false;
 
                     // Target may have been clamped
-                    var actualOffset = this.target - this._lastTarget;
+                    var actualOffset = this.target - this._previousTarget;
 
                     if (actualOffset !== 0) {
                         this._start += actualOffset;
@@ -1260,7 +1277,7 @@
 
                 if (target == this._target) return;
 
-                this._lastTarget = this.target;
+                this._previousTarget = this.target;
 
                 if (!this._isAddingOffset) {
                     this._start = this.current;
